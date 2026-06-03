@@ -1,0 +1,9 @@
+{
+  "name": "tarkovlab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TarkovLab landing page for Escape from Tarkov.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
