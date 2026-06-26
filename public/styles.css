@@ -1,167 +1,1273 @@
+/* TarkovLab - Tactical Interface Stylesheet */
+
 :root {
   color-scheme: dark;
-  --bg-1: #09100d;
-  --bg-2: #0f1612;
-  --panel: rgba(14, 19, 16, 0.88);
-  --panel-strong: rgba(18, 24, 20, 0.96);
-  --line: rgba(186, 193, 170, 0.16);
-  --line-strong: rgba(186, 193, 170, 0.26);
+  
+  /* Color Palette */
+  --bg-1: #070b09;
+  --bg-2: #0e1511;
+  --bg-dossier: rgba(9, 14, 11, 0.95);
+  --panel: rgba(13, 19, 16, 0.75);
+  --panel-strong: rgba(18, 25, 21, 0.92);
+  --panel-hover: rgba(22, 31, 26, 0.9);
+  
+  /* Borders and Lines */
+  --line: rgba(186, 193, 170, 0.08);
+  --line-strong: rgba(186, 193, 170, 0.22);
+  --line-active: rgba(156, 165, 94, 0.6);
+  
+  /* Text Colors */
   --text: #ece7d6;
-  --muted: #9fa58f;
+  --text-muted: #8d947e;
+  --text-dark: #4b5240;
+  
+  /* Accents & Statuses */
   --accent: #9ca55e;
-  --accent-soft: rgba(156, 165, 94, 0.18);
-  --shadow: 0 28px 80px rgba(0, 0, 0, 0.55);
+  --accent-soft: rgba(156, 165, 94, 0.12);
+  --accent-glow: 0 0 15px rgba(156, 165, 94, 0.35);
+  
+  --warning: #cf6a32;
+  --warning-soft: rgba(207, 106, 50, 0.12);
+  --warning-glow: 0 0 12px rgba(207, 106, 50, 0.35);
+  
+  --success: #5eb37e;
+  --success-soft: rgba(94, 179, 126, 0.12);
+  --success-glow: 0 0 12px rgba(94, 179, 126, 0.35);
+  
+  /* Layout Constants */
+  --header-height: 80px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 16px;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  --transition-speed: 0.25s;
 }
 
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Reset and Base Styles */
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--bg-1);
 }
 
 body {
-  margin: 0;
-  min-height: 100vh;
-  overflow: hidden;
   font-family: 'Rajdhani', sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at 50% 18%, rgba(156, 165, 94, 0.18), transparent 24%),
-    radial-gradient(circle at 50% 130%, rgba(255, 255, 255, 0.05), transparent 18%),
-    linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 58%, #050706 100%);
+  background: 
+    radial-gradient(circle at 50% 15%, rgba(156, 165, 94, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.02), transparent 25%),
+    linear-gradient(180deg, var(--bg-2) 0%, var(--bg-1) 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }
 
+/* Tactical Background Elements */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
-  background-size: 54px 54px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 88%);
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(circle, rgba(0, 0, 0, 1) 40%, rgba(0, 0, 0, 0.1) 100%);
   pointer-events: none;
+  z-index: 0;
 }
 
 .page-frame {
   position: fixed;
-  inset: 18px;
-  border-radius: 30px;
-  border: 1px solid rgba(186, 193, 170, 0.08);
+  inset: 15px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-lg);
   pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 0 0 100px rgba(0, 0, 0, 0.1) inset;
 }
 
 .noise {
   position: fixed;
   inset: 0;
-  opacity: 0.1;
-  mix-blend-mode: screen;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 4px 4px;
+  opacity: 0.04;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 3px 3px;
   pointer-events: none;
+  z-index: 99;
 }
 
-.hero {
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 14px;
-}
-
-.hero-stack {
-  position: relative;
-  width: min(280px, 100%);
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  padding: clamp(8px, 1.5vw, 12px);
-  text-align: center;
-  transform: translateY(-6vh);
-}
-
-.hero-stack::before {
-  content: '';
-  position: absolute;
-  inset: 14% 18%;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(156, 165, 94, 0.14), transparent 62%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.028), transparent 72%);
-  filter: blur(10px);
+.scanlines {
+  position: fixed;
+  inset: 0;
   pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.15) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 101;
+  opacity: 0.3;
 }
 
-.hero-stack > * {
+/* App Container Layout */
+.app-container {
   position: relative;
-  z-index: 1;
+  z-index: 10;
+  max-width: 1720px;
+  height: 100vh;
+  margin: 0 auto;
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: hidden;
 }
 
-.logo-shell {
-  width: clamp(54px, 8vw, 68px);
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  padding: clamp(5px, 0.8vw, 8px);
-  border-radius: 16px;
+/* HUD Header Styling */
+.hud-header {
+  height: var(--header-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 15px;
+  flex-shrink: 0;
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-logo-wrapper {
+  width: 50px;
+  height: 50px;
   border: 1px solid var(--line-strong);
-  background:
-    linear-gradient(180deg, rgba(156, 165, 94, 0.16), rgba(156, 165, 94, 0.04)),
-    rgba(10, 14, 12, 0.82);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.02) inset,
-    0 12px 26px rgba(0, 0, 0, 0.38);
+  background: rgba(156, 165, 94, 0.05);
+  border-radius: var(--border-radius-md);
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  box-shadow: var(--accent-soft) 0 0 10px;
 }
 
-.logo-shell img {
-  display: block;
-  width: 74%;
-  height: 74%;
+.hud-logo {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
-  object-position: center;
-  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.34));
+  filter: drop-shadow(0 0 5px rgba(156, 165, 94, 0.4));
 }
 
-.soon-copy {
-  margin: 0;
-  color: var(--text);
+.hud-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.hud-title {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: clamp(1.9rem, 5vw, 3rem);
-  line-height: 0.92;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 2.2rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  line-height: 0.9;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
-@media (max-width: 700px) {
-  .page-frame {
-    inset: 10px;
-    border-radius: 22px;
-  }
+.hud-subtitle {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
 
-  .hero {
-    padding: 10px;
-  }
+/* Tarkov Time Clocks */
+.hud-clocks-container {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  padding: 8px 20px;
+  border-radius: var(--border-radius-sm);
+  gap: 15px;
+}
 
-  .logo-shell {
-    width: clamp(46px, 14vw, 58px);
-    border-radius: 14px;
-  }
+.hud-clock-box {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
 
-  .hero-stack {
-    gap: 8px;
-    transform: translateY(-4vh);
-  }
+.clock-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
 
-  .soon-copy {
-    font-size: clamp(1.6rem, 8vw, 2.4rem);
-    letter-spacing: 0.1em;
+.clock-time {
+  font-family: 'Rajdhani', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: var(--accent-glow);
+  letter-spacing: 0.05em;
+}
+
+.hud-clock-separator {
+  width: 1px;
+  height: 15px;
+  background: var(--line-strong);
+}
+
+/* Status Panel */
+.hud-status {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+
+.status-indicator.warning {
+  color: var(--warning);
+  background: var(--warning-soft);
+  border: 1px solid rgba(207, 106, 50, 0.2);
+}
+
+.status-indicator.success {
+  color: var(--success);
+  background: var(--success-soft);
+  border: 1px solid rgba(94, 179, 126, 0.2);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-indicator.warning .status-dot {
+  background-color: var(--warning);
+  box-shadow: var(--warning-glow);
+}
+
+.status-indicator.success .status-dot {
+  background-color: var(--success);
+  box-shadow: var(--success-glow);
+}
+
+.status-dot.pulsing {
+  animation: status-flicker 1.8s infinite alternate;
+}
+
+@keyframes status-flicker {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+/* Main Content Layout */
+.hud-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Traders Grid Section */
+.traders-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+/* Control HUD Filter Bar */
+.control-hud {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.search-box-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+#trader-search {
+  width: 100%;
+  background: rgba(6, 10, 8, 0.85);
+  border: 1px solid var(--line-strong);
+  padding: 12px 16px 12px 38px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  border-radius: var(--border-radius-sm);
+  outline: none;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+#trader-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(156, 165, 94, 0.15);
+}
+
+.hud-bracket-design {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 70%;
+  border-right: 2px solid var(--text-dark);
+  border-top: 2px solid var(--text-dark);
+  border-bottom: 2px solid var(--text-dark);
+  pointer-events: none;
+}
+
+.filters-scroller {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filters-container {
+  display: flex;
+  gap: 8px;
+  width: max-content;
+}
+
+.filter-btn {
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line-strong);
+  padding: 8px 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--transition-speed);
+}
+
+.filter-btn:hover {
+  background: rgba(156, 165, 94, 0.04);
+  border-color: var(--line-active);
+  color: var(--text);
+}
+
+.filter-btn.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+  box-shadow: var(--accent-glow);
+}
+
+.btn-bullet {
+  color: var(--text-dark);
+  font-size: 0.6rem;
+}
+
+.filter-btn.active .btn-bullet {
+  color: var(--accent);
+}
+
+/* Trader Cards Grid */
+.traders-grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
+  padding-right: 6px;
+}
+
+.trader-card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.trader-card:hover {
+  background: var(--panel-hover);
+  border-color: var(--line-active);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  animation: glitch-flicker 0.4s ease-in-out;
+}
+
+.trader-card.active {
+  background: var(--panel-strong);
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow), var(--shadow);
+}
+
+/* Tactical Corner Brackets for Cards */
+.trader-card-border-corner {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid transparent;
+  pointer-events: none;
+  z-index: 5;
+  transition: border-color var(--transition-speed);
+}
+
+.trader-card-border-corner.top-left { top: 6px; left: 6px; border-top-color: var(--line-strong); border-left-color: var(--line-strong); }
+.trader-card-border-corner.top-right { top: 6px; right: 6px; border-top-color: var(--line-strong); border-right-color: var(--line-strong); }
+.trader-card-border-corner.bottom-left { bottom: 6px; left: 6px; border-bottom-color: var(--line-strong); border-left-color: var(--line-strong); }
+.trader-card-border-corner.bottom-right { bottom: 6px; right: 6px; border-bottom-color: var(--line-strong); border-right-color: var(--line-strong); }
+
+.trader-card.active .trader-card-border-corner.top-left { border-top-color: var(--accent); border-left-color: var(--accent); }
+.trader-card.active .trader-card-border-corner.top-right { border-top-color: var(--accent); border-right-color: var(--accent); }
+.trader-card.active .trader-card-border-corner.bottom-left { border-bottom-color: var(--accent); border-left-color: var(--accent); }
+.trader-card.active .trader-card-border-corner.bottom-right { border-bottom-color: var(--accent); border-right-color: var(--accent); }
+
+/* Card Image Area */
+.trader-image-container {
+  position: relative;
+  aspect-ratio: 1.25;
+  background: #040706;
+  border-bottom: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.trader-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  filter: grayscale(65%) contrast(110%) brightness(90%);
+  transition: filter var(--transition-speed) ease, transform 0.4s ease;
+}
+
+.trader-card:hover .trader-card-img {
+  filter: grayscale(0%) contrast(100%) brightness(95%);
+  transform: scale(1.04);
+}
+
+.trader-card.active .trader-card-img {
+  filter: grayscale(0%) contrast(100%) brightness(100%);
+}
+
+.trader-image-scanline {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 0%,
+    rgba(156, 165, 94, 0.06) 10%,
+    rgba(18, 16, 16, 0) 20%
+  );
+  background-size: 100% 200%;
+  animation: scanline-scroll 6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline-scroll {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 200%; }
+}
+
+/* Card Info */
+.trader-card-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-grow: 1;
+}
+
+.trader-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trader-card-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.trader-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-dark);
+}
+
+.trader-status-dot.high {
+  background: var(--success);
+  box-shadow: var(--success-glow);
+}
+
+.trader-status-dot.low {
+  background: var(--warning);
+  box-shadow: var(--warning-glow);
+}
+
+.trader-card-specialty {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.trader-card-stats-row {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+}
+
+.trader-stat-mini {
+  color: var(--text-muted);
+}
+
+.trader-stat-mini b {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* Inspect Section (Dossier View) */
+.inspect-section {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.dossier-wrapper {
+  position: relative;
+  background: var(--bg-dossier);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-height: 100%;
+  box-shadow: var(--shadow);
+}
+
+/* Dossier framing ticks */
+.dossier-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  pointer-events: none;
+}
+.dossier-corner.top-left { top: -1px; left: -1px; border-top-color: var(--line-strong); border-left-color: var(--line-strong); }
+.dossier-corner.top-right { top: -1px; right: -1px; border-top-color: var(--line-strong); border-right-color: var(--line-strong); }
+.dossier-corner.bottom-left { bottom: -1px; left: -1px; border-bottom-color: var(--line-strong); border-left-color: var(--line-strong); }
+.dossier-corner.bottom-right { bottom: -1px; right: -1px; border-bottom-color: var(--line-strong); border-right-color: var(--line-strong); }
+
+/* Inspect Header Block */
+.inspect-header-block {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.inspect-avatar-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  background: #040706;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.inspect-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 10%;
+}
+
+.inspect-avatar-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(156, 165, 94, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(156, 165, 94, 0.05) 1px, transparent 1px);
+  background-size: 10px 10px;
+  pointer-events: none;
+}
+
+.inspect-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inspect-tactical-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.inspect-trader-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  color: var(--text);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+}
+
+.inspect-trader-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.meta-item b {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+/* Description / Bio */
+.inspect-desc-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  padding: 14px;
+  border-radius: var(--border-radius-sm);
+}
+
+.desc-tactical-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.desc-line {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  margin-left: 12px;
+}
+
+.desc-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.trader-tagline {
+  font-style: italic;
+  color: var(--accent);
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.trader-bio {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+/* Tabs System */
+.inspect-tabs-block {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+}
+
+.tabs-nav {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 10px 4px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.tab-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  text-shadow: var(--accent-glow);
+}
+
+.tab-content-area {
+  flex: 1;
+}
+
+/* Profile / Relation Tab Content */
+.tactical-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.tactical-stat-box {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  padding: 12px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.stat-value.positive { color: var(--success); text-shadow: var(--success-glow); }
+.stat-value.warning { color: var(--warning); text-shadow: var(--warning-glow); }
+
+.stat-bar-container {
+  height: 3px;
+  background: var(--line);
+  border-radius: 1px;
+  overflow: hidden;
+  margin: 4px 0;
+}
+
+.stat-bar {
+  height: 100%;
+  background: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+
+.stat-footer {
+  font-size: 0.6rem;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  margin-bottom: 10px;
+  border-left: 2px solid var(--accent);
+  padding-left: 6px;
+}
+
+.loyalty-levels-timeline {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.loyalty-tier-card {
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sm);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.loyalty-tier-card.unlocked {
+  border-color: rgba(94, 179, 126, 0.3);
+  background: rgba(94, 179, 126, 0.02);
+}
+
+.loyalty-tier-card.locked {
+  opacity: 0.55;
+}
+
+.tier-badge {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.loyalty-tier-card.unlocked .tier-badge {
+  color: var(--success);
+  text-shadow: var(--success-glow);
+}
+
+.tier-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  width: 100%;
+}
+
+.tier-status {
+  font-weight: 700;
+  font-size: 0.65rem;
+  margin-bottom: 2px;
+}
+
+.loyalty-tier-card.unlocked .tier-status { color: var(--success); }
+.loyalty-tier-card.locked .tier-status { color: var(--text-dark); }
+
+.tier-requirement b {
+  color: var(--text);
+}
+
+/* Quests Tab Content */
+.quests-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.quest-item-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quest-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+}
+
+.quest-item-name {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.quest-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: var(--warning-soft);
+  color: var(--warning);
+  border: 1px solid rgba(207, 106, 50, 0.2);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.quest-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quest-section h5 {
+  font-size: 0.65rem;
+  color: var(--text-dark);
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+}
+
+.quest-list {
+  list-style: none;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.list-bullet {
+  color: var(--accent);
+  font-size: 0.5rem;
+  margin-right: 4px;
+}
+
+.rewards-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.reward-tag {
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+/* Barters Tab Content */
+.barters-tab-content {
+  overflow-y: auto;
+  max-height: 280px;
+  padding-right: 4px;
+}
+
+.barters-items-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.barter-item-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--line);
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.barter-item-image-wrapper {
+  position: relative;
+  aspect-ratio: 2.2;
+  background: #030504;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.item-overlay-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(156, 165, 94, 0.08), transparent 60%);
+  pointer-events: none;
+}
+
+.item-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+
+.item-category-tag {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  background: var(--accent);
+  color: var(--bg-1);
+  padding: 1px 4px;
+  border-radius: 1px;
+}
+
+.item-visual-placeholder {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: var(--text-dark);
+  letter-spacing: 0.05em;
+  opacity: 0.75;
+}
+
+.barter-item-info {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.barter-item-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barter-cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.65rem;
+}
+
+.cost-label {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.cost-value {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Empty State / Loading State */
+.loading-state, .empty-state-card {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--border-radius-md);
+  gap: 16px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--line);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spinner-spin 0.8s linear infinite;
+}
+
+@keyframes spinner-spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  text-shadow: var(--accent-glow);
+}
+
+.empty-icon {
+  font-size: 2rem;
+  color: var(--warning);
+  text-shadow: var(--warning-glow);
+}
+
+.empty-state-card h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.05em;
+}
+
+.empty-state-card p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Micro-animations */
+@keyframes glitch-flicker {
+  0% { opacity: 0.95; }
+  10% { opacity: 0.85; filter: contrast(1.2); }
+  20% { opacity: 1; }
+  30% { opacity: 0.9; }
+  50% { opacity: 0.95; }
+  80% { opacity: 0.88; }
+  100% { opacity: 1; }
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .app-container {
+    padding: 20px;
+  }
+  
+  .hud-main {
+    grid-template-columns: 1fr 380px;
+    gap: 16px;
+  }
+  
+  .loyalty-levels-timeline {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
   }
 }
 
-@media (max-width: 420px) {
-  .logo-shell {
-    width: clamp(42px, 16vw, 54px);
+@media (max-width: 1024px) {
+  .app-container {
+    height: auto;
+    overflow: visible;
+  }
+  
+  .hud-main {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+  
+  .traders-grid {
+    max-height: 500px;
+  }
+  
+  .inspect-section {
+    max-height: none;
+    overflow: visible;
+  }
+  
+  .quests-tab-content, .barters-tab-content {
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .hud-header {
+    flex-direction: column;
+    height: auto;
+    gap: 14px;
+    padding-bottom: 20px;
+    align-items: stretch;
+  }
+  
+  .hud-clocks-container {
+    justify-content: center;
+  }
+  
+  .hud-status {
+    align-items: center;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .app-container {
+    padding: 10px 18px;
+  }
+  
+  .traders-grid {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+  
+  .inspect-header-block {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .inspect-avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .traders-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  
+  .trader-card-name {
+    font-size: 1.25rem;
+  }
+  
+  .hud-clocks-container {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+  
+  .hud-clock-separator {
+    display: none;
+  }
+  
+  .loyalty-levels-timeline {
+    grid-template-columns: 1fr;
+  }
+  
+  .barters-items-grid {
+    grid-template-columns: 1fr;
   }
 }

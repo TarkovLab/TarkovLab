@@ -3,10 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TarkovLab | Coming Soon</title>
+    <title>TarkovLab | Contractors Interface</title>
     <meta
       name="description"
-      content="TarkovLab coming soon page for Escape from Tarkov."
+      content="Tactical interface for Escape from Tarkov contractors and traders, powered by TarkovLab."
     />
     <meta name="theme-color" content="#09100d" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,136 +15,172 @@
       href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <style>
-      :root {
-        color-scheme: dark;
-        --text: #ece7d6;
-        --line-strong: rgba(186, 193, 170, 0.26);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        margin: 0;
-        min-height: 100%;
-      }
-
-      body {
-        min-height: 100vh;
-        overflow: hidden;
-        font-family: 'Rajdhani', sans-serif;
-        color: var(--text);
-        background:
-          radial-gradient(circle at 50% 18%, rgba(156, 165, 94, 0.18), transparent 24%),
-          linear-gradient(180deg, #0f1612 0%, #09100d 58%, #050706 100%);
-      }
-
-      .page-frame {
-        position: fixed;
-        inset: 18px;
-        border-radius: 30px;
-        border: 1px solid rgba(186, 193, 170, 0.08);
-        pointer-events: none;
-      }
-
-      .noise {
-        position: fixed;
-        inset: 0;
-        opacity: 0.08;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-        background-size: 4px 4px;
-        pointer-events: none;
-      }
-
-      .hero {
-        position: relative;
-        z-index: 1;
-        min-height: 100vh;
-        display: grid;
-        place-items: center;
-        padding: 24px;
-      }
-
-      .hero-stack {
-        display: grid;
-        justify-items: center;
-        gap: clamp(8px, 1.4vw, 16px);
-        text-align: center;
-        width: min(92vw, 720px);
-      }
-
-      .logo-shell {
-        width: min(72vw, 520px);
-        aspect-ratio: 1;
-        display: grid;
-        place-items: center;
-        padding: 0;
-        border: 0;
-        border-radius: 0;
-        background: transparent;
-        box-shadow: none;
-      }
-
-      .logo-shell img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        object-position: center;
-      }
-
-      .soon-copy {
-        margin: 0;
-        color: var(--text);
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: clamp(30px, 4vw, 72px);
-        line-height: 0.9;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-      }
-
-      @media (max-width: 700px) {
-        .page-frame {
-          inset: 10px;
-          border-radius: 22px;
-        }
-
-        .hero {
-          padding: 18px;
-        }
-
-        .hero-stack {
-          gap: 8px;
-          width: min(94vw, 420px);
-        }
-
-        .logo-shell {
-          width: min(84vw, 320px);
-          border-radius: 0;
-        }
-
-        .soon-copy {
-          font-size: clamp(24px, 8vw, 42px);
-          letter-spacing: 0.14em;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <!-- Background immersive tactical effects -->
     <div class="page-frame"></div>
     <div class="noise"></div>
+    <div class="scanlines"></div>
 
-    <main class="hero">
-      <section class="hero-stack" aria-label="TarkovLab coming soon">
-        <div class="logo-shell" aria-label="TarkovLab icon">
-          <img src="/assets/logo.png" alt="TarkovLab icon" />
+    <div class="app-container">
+      <!-- HUD Top Bar Header -->
+      <header class="hud-header">
+        <div class="hud-brand">
+          <div class="hud-logo-wrapper">
+            <img src="/assets/logo.png" alt="TarkovLab" class="hud-logo" />
+          </div>
+          <div class="hud-title-block">
+            <h1 class="hud-title">TARKOVLAB</h1>
+            <span class="hud-subtitle">TACTICAL INTELLIGENCE PROTOCOL v1.0.4</span>
+          </div>
         </div>
 
-        <p class="soon-copy">Coming Soon</p>
-      </section>
-    </main>
+        <!-- In-Game Tarkov Timezones Clocks -->
+        <div class="hud-clocks-container">
+          <div class="hud-clock-box">
+            <span class="clock-label">DAY OPERATION //</span>
+            <span id="tarkov-clock-1" class="clock-time">00:00:00</span>
+          </div>
+          <div class="hud-clock-separator"></div>
+          <div class="hud-clock-box">
+            <span class="clock-label">NIGHT OPERATION //</span>
+            <span id="tarkov-clock-2" class="clock-time">12:00:00</span>
+          </div>
+        </div>
+
+        <!-- Network connection status indicator -->
+        <div class="hud-status" id="api-status-container">
+          <div class="status-indicator warning" id="api-status-indicator">
+            <span class="status-dot pulsing" id="api-status-dot"></span>
+            <span class="status-text" id="api-status-text">API.TARKOVLAB.ORG: CONNECTING</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Interface Layout -->
+      <main class="hud-main">
+        <!-- Left Side: Quest List & Filter Center -->
+        <section class="traders-section" aria-label="Operation Tasks Database">
+          <!-- Tactical HUD Search & Filters -->
+          <div class="control-hud">
+            <div class="search-box-wrapper">
+              <span class="search-icon">⌕</span>
+              <input 
+                type="text" 
+                id="quest-search" 
+                placeholder="SEARCH FOR OPERATION TASK / QUEST..." 
+                autocomplete="off"
+                aria-label="Search quests"
+              />
+              <span class="hud-bracket-design"></span>
+            </div>
+            
+            <div class="filters-scroller">
+              <div class="filters-container" id="trader-filters">
+                <button class="filter-btn active" data-trader="all">
+                  <span class="btn-bullet">▪</span> ALL GIVERS
+                </button>
+                <button class="filter-btn" data-trader="prapor">
+                  <span class="btn-bullet">▪</span> PRAPOR
+                </button>
+                <button class="filter-btn" data-trader="therapist">
+                  <span class="btn-bullet">▪</span> THERAPIST
+                </button>
+                <button class="filter-btn" data-trader="skier">
+                  <span class="btn-bullet">▪</span> SKIER
+                </button>
+                <button class="filter-btn" data-trader="peacekeeper">
+                  <span class="btn-bullet">▪</span> PEACEKEEPER
+                </button>
+                <button class="filter-btn" data-trader="mechanic">
+                  <span class="btn-bullet">▪</span> MECHANIC
+                </button>
+                <button class="filter-btn" data-trader="ragman">
+                  <span class="btn-bullet">▪</span> RAGMAN
+                </button>
+                <button class="filter-btn" data-trader="jaeger">
+                  <span class="btn-bullet">▪</span> JAEGER
+                </button>
+                <button class="filter-btn" data-trader="fence">
+                  <span class="btn-bullet">▪</span> FENCE
+                </button>
+                <button class="filter-btn" data-trader="lightkeeper">
+                  <span class="btn-bullet">▪</span> LIGHTKEEPER
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Grid Container -->
+          <div id="quests-grid" class="traders-grid">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <span>DECRYPTING SECURE CHANNELS...</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Right Side: Quest Dossier Detail Inspector -->
+        <aside id="inspect-panel" class="inspect-section" aria-label="Quest Dossier">
+          <div class="dossier-wrapper">
+            <!-- Tactical dossier frame corners -->
+            <div class="dossier-corner top-left"></div>
+            <div class="dossier-corner top-right"></div>
+            <div class="dossier-corner bottom-left"></div>
+            <div class="dossier-corner bottom-right"></div>
+
+            <!-- Inspect Header -->
+            <div id="inspect-quest-header" class="inspect-header-block" style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 16px;">
+              <div class="no-quest-selected" style="text-align: center; padding: 40px 20px; font-family: 'Rajdhani', sans-serif; color: var(--text-muted); width: 100%;">
+                <span style="font-size: 1.2rem; font-weight: 600; display: block; margin-bottom: 8px; color: var(--text-dark);">NO TASK SELECTED</span>
+                <span>Select an operation task from the decrypted list to view dossier intelligence.</span>
+              </div>
+            </div>
+
+            <!-- Details Body -->
+            <div id="quest-details-body" style="display: none; flex-direction: column; gap: 16px; overflow-y: auto; flex: 1; padding-right: 4px; margin-top: 16px;">
+              <!-- Briefing / Intel Report -->
+              <div class="inspect-desc-block" style="margin-bottom: 0;">
+                <div class="desc-tactical-header">
+                  <span>INTEL REPORT // BRIEFING</span>
+                  <span class="desc-line"></span>
+                </div>
+                <div id="quest-wiki-brief" class="desc-content">
+                  <!-- Wiki / description text -->
+                </div>
+              </div>
+
+              <!-- Objectives Section -->
+              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
+                <h5 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">TACTICAL OBJECTIVES //</h5>
+                <ul id="quest-objectives-list" class="quest-list">
+                  <!-- Injected dynamically -->
+                </ul>
+              </div>
+
+              <!-- Rewards Section -->
+              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
+                <h5 style="font-size: 0.75rem; color: var(--warning); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">COMPLETION REWARDS //</h5>
+                <ul id="quest-rewards-list" class="quest-list">
+                  <!-- Injected dynamically -->
+                </ul>
+              </div>
+
+              <!-- Requirements Section -->
+              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
+                <h5 style="font-size: 0.75rem; color: var(--text-dark); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">DEPENDENCY REQUIREMENTS //</h5>
+                <div id="quest-requirements-info" style="font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                  <!-- Injected dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <!-- Compile typescript output script -->
+    <script type="module" src="js/app.js?v=1.0.5"></script>
   </body>
 </html>
