@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TarkovLab | Achievements</title>
+    <link rel="icon" type="image/png" href="/assets/icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=3" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <a href="/"><img class="logo" src="/assets/logo.png" alt="TarkovLab" /></a>
+        <nav>
+          <a href="/">Quests</a>
+          <a href="/achievements" class="on">Achievements</a>
+        </nav>
+        <div class="status" id="status"><span class="dot"></span><span id="stxt">CONNECTING</span></div>
+      </header>
+
+      <h1>Achievements</h1>
+      <p class="sub">All Escape from Tarkov achievements, sortable by rarity and visibility.</p>
+
+      <div class="toolbar">
+        <div class="search">
+          <span class="ic">⌕</span>
+          <input id="search" type="text" placeholder="Search by name or description..." autocomplete="off" />
+        </div>
+        <div class="filters" id="filters">
+          <button class="fbtn on" data-r="all">All</button>
+          <button class="fbtn" data-r="common">Common</button>
+          <button class="fbtn" data-r="rare">Rare</button>
+          <button class="fbtn" data-r="legendary">Legendary</button>
+          <button class="fbtn" data-r="hidden">Hidden</button>
+        </div>
+        <div class="count" id="count">Loading...</div>
+      </div>
+
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-s="name">Achievement <span class="ar"></span></th>
+              <th class="c-rarity" data-s="rarity">Rarity <span class="ar"></span></th>
+              <th class="c-status" data-s="hidden">Status <span class="ar"></span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr><td colspan="3"><div class="state"><div class="spin"></div>Loading achievements...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script src="/js/achievements.js?v=3"></script>
+  </body>
+</html>
