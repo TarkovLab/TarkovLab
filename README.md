@@ -1,7 +1,7 @@
 <div align="center">
 
 <h1>
-  <img src="https://logo.tarkovlab.org/tl-logo" alt="TarkovLab" style="vertical-align:middle;" />
+  <img src="https://logo.tarkovlab.org/tl-logo" alt="TarkovLab" width="420" style="vertical-align:middle;" />
 </h1>
 
 <p>A clean, dark web app for browsing <strong>Escape From Tarkov</strong> quests and achievements, built on the <a href="https://tarkovlab.org">TarkovLab</a> ecosystem.</p>
