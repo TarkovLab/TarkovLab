@@ -1,81 +1,118 @@
-# TarkovLab - Interactive Contractors Interface
+<div align="center">
 
-TarkovLab is a high-fidelity, interactive web application designed for Escape from Tarkov players. It serves as a tactical computer terminal dashboard detailing the region's 10 primary contractors (traders), their specialties, locations, quest lines, loyalty levels, and barter economies.
+<h1>
+  <img src="https://logo.tarkovlab.org/tl-logo" alt="TarkovLab" style="vertical-align:middle;" />
+</h1>
 
-The application is built with a premium, immersive military computer terminal aesthetic—featuring scanline overlays, CRT-style glow effects, active diagnostic status badges, and dynamic dual Tarkov clocks.
+<p>A clean, dark web app for browsing <strong>Escape From Tarkov</strong> quests and achievements, built on the <a href="https://tarkovlab.org">TarkovLab</a> ecosystem.</p>
 
----
+<!-- Stars -->
+<a href="https://github.com/Nivmizz7/tarkovlab/stargazers">
+  <img src="https://img.shields.io/github/stars/Nivmizz7/tarkovlab?style=for-the-badge&logo=github&logoColor=white&color=FFD700&labelColor=1a1a2e" alt="Stars" />
+</a>
+<!-- Last Commit -->
+<a href="https://github.com/Nivmizz7/tarkovlab/commits/master">
+  <img src="https://img.shields.io/github/last-commit/Nivmizz7/tarkovlab?style=for-the-badge&logo=git&logoColor=white&color=4CAF50&labelColor=1a1a2e" alt="Last Commit" />
+</a>
+<!-- Contributors -->
+<a href="https://github.com/Nivmizz7/tarkovlab/graphs/contributors">
+  <img src="https://img.shields.io/github/contributors/Nivmizz7/tarkovlab?style=for-the-badge&logo=github&logoColor=white&color=6C63FF&labelColor=1a1a2e" alt="Contributors" />
+</a>
+<!-- Pull Requests (all) -->
+<a href="https://github.com/Nivmizz7/tarkovlab/pulls?q=is%3Apr">
+  <img src="https://img.shields.io/github/issues-pr/Nivmizz7/tarkovlab?style=for-the-badge&logo=git-pull-request&logoColor=white&color=00BCD4&labelColor=1a1a2e&label=pull%20requests" alt="Pull Requests" />
+</a>
+<!-- Issues (all) -->
+<a href="https://github.com/Nivmizz7/tarkovlab/issues?q=is%3Aissue">
+  <img src="https://img.shields.io/github/issues/Nivmizz7/tarkovlab?style=for-the-badge&logo=github&logoColor=white&color=FF5722&labelColor=1a1a2e" alt="Issues" />
+</a>
+<!-- License -->
+<a href="LICENSE">
+  <img src="https://img.shields.io/github/license/Nivmizz7/tarkovlab?style=for-the-badge&logo=open-source-initiative&logoColor=white&color=9C27B0&labelColor=1a1a2e" alt="License" />
+</a>
 
-## 🚀 Features Implemented
-
-1. **Complete Contractor Dossier Database**: Authentic, detailed profiles for all 10 Escape from Tarkov traders:
-   - **Prapor** (Weapons & Ammo)
-   - **Therapist** (Medical & Provisions)
-   - **Skier** (Attachments & Gear)
-   - **Peacekeeper** (NATO Equipment)
-   - **Mechanic** (High-Tech & Gunsmithing)
-   - **Ragman** (Gear & Clothing)
-   - **Jaeger** (Hunting & Survival)
-   - **Fence** (Scav Network & Black Market)
-   - **Ref** (Arena Supplies & Custom presets)
-   - **Lightkeeper** (High-Tech Secrets & Operations)
-2. **Tactical Filter & Search Control Center**: Instantly filter contractors by their specialty tags (Weapons, Medical, Gear, Survival, Black Market) or search via their names, real names, or specialties.
-3. **Immersive Dossier Inspect Panel**: Clicking a contractor displays their full tactical intelligence profile:
-   - **01 // Profile & Trust**: Live reputation trackers, transaction volumes, and interactive loyalty level (LL1 to LL4) unlocking requirement checklists.
-   - **02 // Operation Tasks**: A list of representative in-game quests, complete with tactical objective bullet points and capsule reward tags.
-   - **03 // Barter Schemes**: A blueprint grid of simulated barter exchanges they offer.
-4. **Dual Tarkov-Time Clocks**: Displays the two active in-game timezones (Day and Night operations) running at their authentic $7\times$ real-world speed, updating dynamically.
-5. **Robust CDN Portrayal**: Fetches high-quality trader portraits dynamically from the TarkovLab CDN (`https://assets.tarkovlab.org/traders/name.webp`), including automatic spelling fallbacks (e.g., `jaeger` vs. `jeager`) to guarantee image loading.
-6. **AI Context Rules**: Included a workspace rule configuration file (`.agents/AGENTS.md`) so that any AI assistants working on this repo will instantly understand the architecture and style parameters.
-
----
-
-## 🛠️ Technology Stack
-
-- **Frontend**: HTML5, Vanilla CSS3 (tactical styling, micro-animations, and full responsive design), TypeScript.
-- **Backend Server**: Native Node.js static file server (`server.js`) serving the `public/` folder on port `3000`.
-- **Compilation**: TypeScript compiles strictly to browser-compatible ES2022 modules in `public/js/app.js`, loaded natively by the browser without heavy bundlers.
+</div>
 
 ---
 
-## 📦 How to Build & Run
+## What is TarkovLab?
 
-### 1. Run the Application Server
-Run the local Node.js server to serve the static assets:
+**TarkovLab** is a lightweight web application for [Escape From Tarkov](https://www.escapefromtarkov.com/) players. It provides a fast, dark, Tarkov-styled interface to browse the game's quests and achievements, pulling its data live from the TarkovLab GraphQL API.
+
+The app is intentionally simple: plain HTML, CSS and vanilla JavaScript served by a tiny Node.js static server. No frameworks, no build step.
+
+---
+
+## Features
+
+- **Quests** &mdash; Browse every task with its objectives, rewards, reputation changes, unlocks and prerequisites. Filter by trader or search by quest, trader or objective.
+- **Achievements** &mdash; A sortable data table of all in-game achievements, with rarity and hidden status. Filter by rarity, toggle hidden-only, and search by name or description.
+- **Live data** &mdash; Quests and achievements are fetched from the TarkovLab GraphQL API at `https://api.tarkovlab.org/graphql`.
+- **Clean URLs** &mdash; Extensionless routes (`/`, `/achievements`) with automatic redirects from legacy `.html` paths.
+- **Dark, Tarkov-style theme** &mdash; Oswald and Rajdhani typography, muted gold accents, rarity colour coding, fully responsive.
+
+---
+
+## Tech Stack
+
+- **Frontend**: HTML5, vanilla CSS3 and vanilla JavaScript (no framework, no build step).
+- **Server**: Native Node.js static file server (`server.js`) serving the `public/` folder.
+- **Data**: TarkovLab GraphQL API (`api.tarkovlab.org`), backed by the [TarkovData](https://github.com/TarkovLab/TarkovData) dataset.
+
+---
+
+## Project Structure
+
+```
+public/
+  index.html          Quests page
+  achievements.html   Achievements page
+  styles.css          Theme and layout
+  js/
+    quests.js         Quests page logic
+    achievements.js   Achievements page logic
+  assets/             Logo and icon
+server.js             Static file server with clean-URL routing
+```
+
+---
+
+## Running Locally
+
+Start the local Node.js server:
+
 ```bash
 npm start
 ```
-The server will boot and be accessible at:
-👉 **[http://localhost:3000](http://localhost:3000)**
 
-### 2. Compile TypeScript
-To compile the TypeScript source file (`src/app.ts`) into the public script (`public/js/app.js`):
-```bash
-npm run build
-```
+The app is then available at:
 
-To watch and auto-compile on changes during development:
+**[http://localhost:3000](http://localhost:3000)**
+
+The port can be overridden with the `PORT` environment variable:
+
 ```bash
-npm run watch
+PORT=8080 npm start
 ```
 
 ---
 
-## ⚠️ Important: WSL2 Compilation Workaround
-Since this project is hosted on a Windows shared drive mount (`/mnt/c/Users/...`) in WSL, running standard `npm install` can occasionally corrupt the local `node_modules/typescript` installation due to Windows-to-Linux filesystem lock translations. 
+## Contributing
 
-If you encounter `SyntaxError` or compilation errors when running `npm run build`, use this clean workaround:
-1. Create a clean, uncorrupted compiler directory in your native Linux home folder (ext4 filesystem, which is free of translation issues):
-   ```bash
-   mkdir -p ~/ts-compiler && cd ~/ts-compiler && npm install typescript@5.5.2
-   ```
-2. Run the compiler from your home directory, targeting this workspace:
-   ```bash
-   ~/ts-compiler/node_modules/.bin/tsc --project /mnt/c/Users/Niv/tarkovlab/tsconfig.json
-   ```
-This compiles the code successfully into `public/js/app.js` without relying on the corrupted local WSL mount.
+Contributions are welcome. To get started:
+
+1. **Fork** this repository
+2. **Create a branch** for your changes
+3. **Open a Pull Request** against `master`
 
 ---
 
-## 📡 Future API Integration
-The application is currently configured in **Offline Cache Mode** since the live API at `https://api.tarkovlab.org` is offline. The frontend has been designed to transition to dynamic API data fetching in `src/app.ts` as soon as the endpoints are available online.
+## License & Credits
+
+- Maintained as part of the **[TarkovLab](https://tarkovlab.org)** ecosystem.
+- Game data provided by **[TarkovData](https://github.com/TarkovLab/TarkovData)**.
+- Released under the [MIT License](LICENSE).
+
+<div align="center">
+  <sub>Game content and materials are trademarks and copyrights of Battlestate Games and its licensors. All rights reserved.</sub>
+</div>
