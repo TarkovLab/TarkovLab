@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TarkovLab | Achievements Database</title>
+    <link rel="icon" type="image/png" href="https://logo.tarkovlab.org/tl-icon" />
+    <meta
+      name="description"
+      content="Browse every Escape from Tarkov achievement, filtered by rarity and hidden status, powered by TarkovLab."
+    />
+    <meta name="theme-color" content="#09100d" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Background immersive tactical effects -->
+    <div class="page-frame"></div>
+    <div class="noise"></div>
+    <div class="scanlines"></div>
+
+    <div class="app-container">
+      <!-- HUD Top Bar Header -->
+      <header class="hud-header">
+        <div class="hud-brand">
+          <div class="hud-logo-wrapper">
+            <img src="https://logo.tarkovlab.org/tl-icon" alt="TarkovLab" class="hud-logo" />
+          </div>
+          <div class="hud-title-block">
+            <h1 class="hud-title">TARKOVLAB</h1>
+            <span class="hud-subtitle">ACHIEVEMENTS DATABASE // OPERATOR RECORDS</span>
+          </div>
+        </div>
+
+        <!-- Primary navigation between views -->
+        <nav class="hud-nav" aria-label="Primary">
+          <a href="index.html" class="hud-nav-link">QUESTS</a>
+          <a href="achievements.html" class="hud-nav-link active" aria-current="page">ACHIEVEMENTS</a>
+        </nav>
+
+        <!-- In-Game Tarkov Timezones Clocks -->
+        <div class="hud-clocks-container">
+          <div class="hud-clock-box">
+            <span class="clock-label">DAY OPERATION //</span>
+            <span id="tarkov-clock-1" class="clock-time">00:00:00</span>
+          </div>
+          <div class="hud-clock-separator"></div>
+          <div class="hud-clock-box">
+            <span class="clock-label">NIGHT OPERATION //</span>
+            <span id="tarkov-clock-2" class="clock-time">12:00:00</span>
+          </div>
+        </div>
+
+        <!-- Network connection status indicator -->
+        <div class="hud-status" id="api-status-container">
+          <div class="status-indicator warning" id="api-status-indicator">
+            <span class="status-dot pulsing" id="api-status-dot"></span>
+            <span class="status-text" id="api-status-text">API.TARKOVLAB.ORG: CONNECTING</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Interface Layout -->
+      <main class="hud-main hud-main-single">
+        <section class="traders-section" aria-label="Achievements Database">
+          <!-- Tactical HUD Search & Filters -->
+          <div class="control-hud">
+            <div class="search-box-wrapper">
+              <span class="search-icon">⌕</span>
+              <input
+                type="text"
+                id="achievement-search"
+                placeholder="SEARCH ACHIEVEMENT NAME / DESCRIPTION..."
+                autocomplete="off"
+                aria-label="Search achievements"
+              />
+              <span class="hud-bracket-design"></span>
+            </div>
+
+            <div class="filters-scroller">
+              <div class="filters-container" id="rarity-filters">
+                <button class="filter-btn active" data-rarity="all">
+                  <span class="btn-bullet">▪</span> ALL RARITIES
+                </button>
+                <button class="filter-btn" data-rarity="common">
+                  <span class="btn-bullet">▪</span> COMMON
+                </button>
+                <button class="filter-btn" data-rarity="rare">
+                  <span class="btn-bullet">▪</span> RARE
+                </button>
+                <button class="filter-btn" data-rarity="legendary">
+                  <span class="btn-bullet">▪</span> LEGENDARY
+                </button>
+                <button class="filter-btn" data-rarity="hidden">
+                  <span class="btn-bullet">▪</span> HIDDEN ONLY
+                </button>
+              </div>
+            </div>
+
+            <div class="achievements-stats" id="achievements-stats">
+              <span>LOADING RECORDS...</span>
+            </div>
+          </div>
+
+          <!-- Dynamic Grid Container -->
+          <div id="achievements-grid" class="traders-grid achievements-grid">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              <span>DECRYPTING ACHIEVEMENT RECORDS...</span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Compile typescript output script -->
+    <script type="module" src="js/achievements.js?v=1.0.0"></script>
+  </body>
+</html>

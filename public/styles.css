@@ -1271,3 +1271,223 @@ body::before {
     grid-template-columns: 1fr;
   }
 }
+
+/* ============================================================
+   ACHIEVEMENTS PAGE
+   ============================================================ */
+
+/* Primary HUD navigation (Quests / Achievements) */
+.hud-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-nav-link {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  transition: all var(--transition-speed);
+}
+
+.hud-nav-link:hover {
+  color: var(--text);
+  border-color: var(--line-active);
+  background: rgba(156, 165, 94, 0.04);
+}
+
+.hud-nav-link.active {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: var(--accent-glow);
+}
+
+/* Single-column main layout (no inspector aside) */
+.hud-main-single {
+  grid-template-columns: 1fr;
+}
+
+/* Filter bar stat readout */
+.achievements-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+/* Achievement grid (slightly wider cards than trader grid) */
+.achievements-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  align-content: start;
+}
+
+.achievement-card {
+  position: relative;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-speed) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.achievement-card:hover {
+  background: var(--panel-hover);
+  border-color: var(--line-active);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Left accent stripe coloured by rarity */
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--text-dark);
+  z-index: 2;
+}
+
+.achievement-card.rarity-common::before { background: var(--text-muted); }
+.achievement-card.rarity-rare::before { background: #4a9bd1; box-shadow: 0 0 10px rgba(74, 155, 209, 0.5); }
+.achievement-card.rarity-legendary::before { background: var(--warning); box-shadow: var(--warning-glow); }
+
+.achievement-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 0 18px;
+}
+
+.achievement-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--border-radius-sm);
+  background: rgba(0, 0, 0, 0.3);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.achievement-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+}
+
+.achievement-rarity-badge {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--line-strong);
+  color: var(--text-muted);
+  background: rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+.achievement-rarity-badge.rarity-common {
+  color: var(--text-muted);
+  border-color: rgba(141, 148, 126, 0.4);
+}
+
+.achievement-rarity-badge.rarity-rare {
+  color: #6db6e6;
+  border-color: rgba(74, 155, 209, 0.4);
+  background: rgba(74, 155, 209, 0.1);
+}
+
+.achievement-rarity-badge.rarity-legendary {
+  color: var(--warning);
+  border-color: rgba(207, 106, 50, 0.4);
+  background: var(--warning-soft);
+}
+
+.achievement-card-body {
+  padding: 12px 14px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.achievement-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.15;
+}
+
+.achievement-desc {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.achievement-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 14px 12px 18px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.05);
+  margin-top: auto;
+}
+
+.achievement-hidden-tag {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--warning);
+  background: var(--warning-soft);
+  border: 1px solid rgba(207, 106, 50, 0.2);
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+
+.achievement-id-tag {
+  font-family: 'Rajdhani', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.05em;
+  color: var(--text-dark);
+  margin-left: auto;
+}
+
+@media (max-width: 900px) {
+  .hud-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .achievements-grid {
+    grid-template-columns: 1fr;
+  }
+}

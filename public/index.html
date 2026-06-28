@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TarkovLab | Contractors Interface</title>
+    <link rel="icon" type="image/png" href="https://logo.tarkovlab.org/tl-icon" />
     <meta
       name="description"
       content="Tactical interface for Escape from Tarkov contractors and traders, powered by TarkovLab."
@@ -28,13 +29,19 @@
       <header class="hud-header">
         <div class="hud-brand">
           <div class="hud-logo-wrapper">
-            <img src="/assets/logo.png" alt="TarkovLab" class="hud-logo" />
+            <img src="https://logo.tarkovlab.org/tl-icon" alt="TarkovLab" class="hud-logo" />
           </div>
           <div class="hud-title-block">
             <h1 class="hud-title">TARKOVLAB</h1>
             <span class="hud-subtitle">TACTICAL INTELLIGENCE PROTOCOL v1.0.4</span>
           </div>
         </div>
+
+        <!-- Primary navigation between views -->
+        <nav class="hud-nav" aria-label="Primary">
+          <a href="index.html" class="hud-nav-link active" aria-current="page">QUESTS</a>
+          <a href="achievements.html" class="hud-nav-link">ACHIEVEMENTS</a>
+        </nav>
 
         <!-- In-Game Tarkov Timezones Clocks -->
         <div class="hud-clocks-container">
