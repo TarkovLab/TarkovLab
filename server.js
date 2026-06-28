@@ -41,15 +41,34 @@ const server = http.createServer((req, res) => {
   const requestUrl = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(requestUrl.pathname);
 
+  // Redirect legacy .html URLs to clean, extensionless paths (301).
+  if (pathname.endsWith('.html')) {
+    const clean = pathname === '/index.html'
+      ? '/'
+      : pathname.slice(0, -'.html'.length);
+    res.writeHead(301, { Location: clean + requestUrl.search });
+    res.end();
+    return;
+  }
+
+  // Root serves the quests homepage.
   if (pathname === '/') {
     pathname = '/index.html';
   }
 
-  const filePath = path.join(publicDir, pathname);
+  let filePath = path.join(publicDir, pathname);
   if (!filePath.startsWith(publicDir)) {
     res.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Bad request');
     return;
+  }
+
+  // Clean URL with no extension (e.g. /achievements) -> resolve to .html file.
+  if (!path.extname(filePath)) {
+    const asHtml = filePath + '.html';
+    if (fs.existsSync(asHtml)) {
+      filePath = asHtml;
+    }
   }
 
   sendFile(res, filePath);

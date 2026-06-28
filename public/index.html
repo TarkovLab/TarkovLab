@@ -3,191 +3,65 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TarkovLab | Contractors Interface</title>
-    <link rel="icon" type="image/png" href="https://logo.tarkovlab.org/tl-icon" />
-    <meta
-      name="description"
-      content="Tactical interface for Escape from Tarkov contractors and traders, powered by TarkovLab."
-    />
-    <meta name="theme-color" content="#09100d" />
+    <title>TarkovLab | Quests</title>
+    <link rel="icon" type="image/png" href="/assets/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=3" />
   </head>
   <body>
-    <!-- Background immersive tactical effects -->
-    <div class="page-frame"></div>
-    <div class="noise"></div>
-    <div class="scanlines"></div>
-
-    <div class="app-container">
-      <!-- HUD Top Bar Header -->
-      <header class="hud-header">
-        <div class="hud-brand">
-          <div class="hud-logo-wrapper">
-            <img src="https://logo.tarkovlab.org/tl-icon" alt="TarkovLab" class="hud-logo" />
-          </div>
-          <div class="hud-title-block">
-            <h1 class="hud-title">TARKOVLAB</h1>
-            <span class="hud-subtitle">TACTICAL INTELLIGENCE PROTOCOL v1.0.4</span>
-          </div>
-        </div>
-
-        <!-- Primary navigation between views -->
-        <nav class="hud-nav" aria-label="Primary">
-          <a href="index.html" class="hud-nav-link active" aria-current="page">QUESTS</a>
-          <a href="achievements.html" class="hud-nav-link">ACHIEVEMENTS</a>
+    <div class="wrap">
+      <header>
+        <a href="/"><img class="logo" src="/assets/logo.png" alt="TarkovLab" /></a>
+        <nav>
+          <a href="/" class="on">Quests</a>
+          <a href="/achievements">Achievements</a>
         </nav>
-
-        <!-- In-Game Tarkov Timezones Clocks -->
-        <div class="hud-clocks-container">
-          <div class="hud-clock-box">
-            <span class="clock-label">DAY OPERATION //</span>
-            <span id="tarkov-clock-1" class="clock-time">00:00:00</span>
-          </div>
-          <div class="hud-clock-separator"></div>
-          <div class="hud-clock-box">
-            <span class="clock-label">NIGHT OPERATION //</span>
-            <span id="tarkov-clock-2" class="clock-time">12:00:00</span>
-          </div>
-        </div>
-
-        <!-- Network connection status indicator -->
-        <div class="hud-status" id="api-status-container">
-          <div class="status-indicator warning" id="api-status-indicator">
-            <span class="status-dot pulsing" id="api-status-dot"></span>
-            <span class="status-text" id="api-status-text">API.TARKOVLAB.ORG: CONNECTING</span>
-          </div>
-        </div>
+        <div class="status" id="status"><span class="dot"></span><span id="stxt">CONNECTING</span></div>
       </header>
 
-      <!-- Main Interface Layout -->
-      <main class="hud-main">
-        <!-- Left Side: Quest List & Filter Center -->
-        <section class="traders-section" aria-label="Operation Tasks Database">
-          <!-- Tactical HUD Search & Filters -->
-          <div class="control-hud">
-            <div class="search-box-wrapper">
-              <span class="search-icon">⌕</span>
-              <input 
-                type="text" 
-                id="quest-search" 
-                placeholder="SEARCH FOR OPERATION TASK / QUEST..." 
-                autocomplete="off"
-                aria-label="Search quests"
-              />
-              <span class="hud-bracket-design"></span>
-            </div>
-            
-            <div class="filters-scroller">
-              <div class="filters-container" id="trader-filters">
-                <button class="filter-btn active" data-trader="all">
-                  <span class="btn-bullet">▪</span> ALL GIVERS
-                </button>
-                <button class="filter-btn" data-trader="prapor">
-                  <span class="btn-bullet">▪</span> PRAPOR
-                </button>
-                <button class="filter-btn" data-trader="therapist">
-                  <span class="btn-bullet">▪</span> THERAPIST
-                </button>
-                <button class="filter-btn" data-trader="skier">
-                  <span class="btn-bullet">▪</span> SKIER
-                </button>
-                <button class="filter-btn" data-trader="peacekeeper">
-                  <span class="btn-bullet">▪</span> PEACEKEEPER
-                </button>
-                <button class="filter-btn" data-trader="mechanic">
-                  <span class="btn-bullet">▪</span> MECHANIC
-                </button>
-                <button class="filter-btn" data-trader="ragman">
-                  <span class="btn-bullet">▪</span> RAGMAN
-                </button>
-                <button class="filter-btn" data-trader="jaeger">
-                  <span class="btn-bullet">▪</span> JAEGER
-                </button>
-                <button class="filter-btn" data-trader="fence">
-                  <span class="btn-bullet">▪</span> FENCE
-                </button>
-                <button class="filter-btn" data-trader="lightkeeper">
-                  <span class="btn-bullet">▪</span> LIGHTKEEPER
-                </button>
-              </div>
-            </div>
-          </div>
+      <h1>Quests</h1>
+      <p class="sub">Escape from Tarkov tasks with objectives, rewards and requirements.</p>
 
-          <!-- Dynamic Grid Container -->
-          <div id="quests-grid" class="traders-grid">
-            <div class="loading-state">
-              <div class="loading-spinner"></div>
-              <span>DECRYPTING SECURE CHANNELS...</span>
-            </div>
-          </div>
-        </section>
+      <div class="toolbar">
+        <div class="search">
+          <span class="ic">⌕</span>
+          <input id="search" type="text" placeholder="Search by quest, trader or objective..." autocomplete="off" />
+        </div>
+        <div class="count" id="count">Loading...</div>
+      </div>
 
-        <!-- Right Side: Quest Dossier Detail Inspector -->
-        <aside id="inspect-panel" class="inspect-section" aria-label="Quest Dossier">
-          <div class="dossier-wrapper">
-            <!-- Tactical dossier frame corners -->
-            <div class="dossier-corner top-left"></div>
-            <div class="dossier-corner top-right"></div>
-            <div class="dossier-corner bottom-left"></div>
-            <div class="dossier-corner bottom-right"></div>
+      <div class="filters" id="filters" style="margin-bottom:18px;">
+        <button class="fbtn on" data-t="all">All</button>
+        <button class="fbtn" data-t="prapor">Prapor</button>
+        <button class="fbtn" data-t="therapist">Therapist</button>
+        <button class="fbtn" data-t="skier">Skier</button>
+        <button class="fbtn" data-t="peacekeeper">Peacekeeper</button>
+        <button class="fbtn" data-t="mechanic">Mechanic</button>
+        <button class="fbtn" data-t="ragman">Ragman</button>
+        <button class="fbtn" data-t="jaeger">Jaeger</button>
+        <button class="fbtn" data-t="fence">Fence</button>
+        <button class="fbtn" data-t="lightkeeper">Lightkeeper</button>
+      </div>
 
-            <!-- Inspect Header -->
-            <div id="inspect-quest-header" class="inspect-header-block" style="display: flex; gap: 16px; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 16px;">
-              <div class="no-quest-selected" style="text-align: center; padding: 40px 20px; font-family: 'Rajdhani', sans-serif; color: var(--text-muted); width: 100%;">
-                <span style="font-size: 1.2rem; font-weight: 600; display: block; margin-bottom: 8px; color: var(--text-dark);">NO TASK SELECTED</span>
-                <span>Select an operation task from the decrypted list to view dossier intelligence.</span>
-              </div>
-            </div>
-
-            <!-- Details Body -->
-            <div id="quest-details-body" style="display: none; flex-direction: column; gap: 16px; overflow-y: auto; flex: 1; padding-right: 4px; margin-top: 16px;">
-              <!-- Briefing / Intel Report -->
-              <div class="inspect-desc-block" style="margin-bottom: 0;">
-                <div class="desc-tactical-header">
-                  <span>INTEL REPORT // BRIEFING</span>
-                  <span class="desc-line"></span>
-                </div>
-                <div id="quest-wiki-brief" class="desc-content">
-                  <!-- Wiki / description text -->
-                </div>
-              </div>
-
-              <!-- Objectives Section -->
-              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
-                <h5 style="font-size: 0.75rem; color: var(--accent); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">TACTICAL OBJECTIVES //</h5>
-                <ul id="quest-objectives-list" class="quest-list">
-                  <!-- Injected dynamically -->
-                </ul>
-              </div>
-
-              <!-- Rewards Section -->
-              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
-                <h5 style="font-size: 0.75rem; color: var(--warning); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">COMPLETION REWARDS //</h5>
-                <ul id="quest-rewards-list" class="quest-list">
-                  <!-- Injected dynamically -->
-                </ul>
-              </div>
-
-              <!-- Requirements Section -->
-              <div class="quest-section" style="background: rgba(0,0,0,0.15); border: 1px solid var(--line); padding: 16px; border-radius: var(--border-radius-sm);">
-                <h5 style="font-size: 0.75rem; color: var(--text-dark); margin-bottom: 12px; letter-spacing: 0.1em; font-family: 'Bebas Neue', sans-serif;">DEPENDENCY REQUIREMENTS //</h5>
-                <div id="quest-requirements-info" style="font-family: 'Rajdhani', sans-serif; font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-                  <!-- Injected dynamically -->
-                </div>
-              </div>
-            </div>
+      <div class="cols">
+        <div class="qlist" id="qlist">
+          <div class="state"><div class="spin"></div>Loading quests...</div>
+        </div>
+        <aside class="detail" id="detail">
+          <div class="empty" id="empty"><span class="t">No quest selected</span>Select a quest to view its details.</div>
+          <div id="body" style="display:none;">
+            <div class="dhead" id="dhead"></div>
+            <div class="sec"><div class="h">Briefing</div><div id="wiki"></div></div>
+            <div class="sec"><div class="h">Objectives</div><ul class="lst" id="objs"></ul></div>
+            <div class="sec"><div class="h w">Rewards</div><ul class="lst w" id="rews"></ul></div>
+            <div class="sec"><div class="h m">Requirements</div><div class="req" id="reqs"></div></div>
           </div>
         </aside>
-      </main>
+      </div>
     </div>
 
-    <!-- Compile typescript output script -->
-    <script type="module" src="js/app.js?v=1.0.5"></script>
+    <script src="/js/quests.js?v=3"></script>
   </body>
 </html>

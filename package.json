@@ -2,13 +2,8 @@
   "name": "tarkovlab",
   "version": "1.0.0",
   "private": true,
-  "description": "TarkovLab landing page for Escape from Tarkov.",
+  "description": "TarkovLab web app for Escape from Tarkov (quests & achievements).",
   "scripts": {
-    "start": "node server.js",
-    "build": "rm -rf node_modules/typescript && npx -y --package typescript tsc",
-    "watch": "rm -rf node_modules/typescript && npx -y --package typescript tsc -w"
-  },
-  "devDependencies": {
-    "typescript": "^5.5.2"
+    "start": "node server.js"
   }
 }
