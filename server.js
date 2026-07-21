@@ -4,6 +4,7 @@ const path = require('node:path');
 
 const port = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, 'public');
+const indexHtml = path.join(publicDir, 'index.html');
 
 const contentTypes = {
   '.html': 'text/html; charset=utf-8',
@@ -28,10 +29,9 @@ function sendFile(res, filePath) {
       res.end('Not found');
       return;
     }
-
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': (ext === '.html' || ext === '.js') ? 'no-cache' : 'public, max-age=3600'
+      'Cache-Control': ext === '.js' ? 'no-cache' : 'public, max-age=3600'
     });
     res.end(data);
   });
@@ -41,19 +41,9 @@ const server = http.createServer((req, res) => {
   const requestUrl = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(requestUrl.pathname);
 
-  // Redirect legacy .html URLs to clean, extensionless paths (301).
-  if (pathname.endsWith('.html')) {
-    const clean = pathname === '/index.html'
-      ? '/'
-      : pathname.slice(0, -'.html'.length);
-    res.writeHead(301, { Location: clean + requestUrl.search });
-    res.end();
-    return;
-  }
-
-  // Root serves the quests homepage.
   if (pathname === '/') {
-    pathname = '/index.html';
+    sendFile(res, indexHtml);
+    return;
   }
 
   let filePath = path.join(publicDir, pathname);
@@ -63,15 +53,21 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Clean URL with no extension (e.g. /achievements) -> resolve to .html file.
   if (!path.extname(filePath)) {
     const asHtml = filePath + '.html';
     if (fs.existsSync(asHtml)) {
-      filePath = asHtml;
+      sendFile(res, asHtml);
+      return;
     }
   }
 
-  sendFile(res, filePath);
+  fs.stat(filePath, (err) => {
+    if (err) {
+      sendFile(res, indexHtml);
+    } else {
+      sendFile(res, filePath);
+    }
+  });
 });
 
 server.listen(port, () => {
