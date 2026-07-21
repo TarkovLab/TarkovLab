@@ -3,65 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>TarkovLab | Quests</title>
+    <title>TarkovLab</title>
     <link rel="icon" type="image/png" href="/assets/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="/styles.css?v=3" />
+    <link rel="stylesheet" href="/styles.css?v=5" />
   </head>
   <body>
     <div class="wrap">
       <header>
         <a href="/"><img class="logo" src="/assets/logo.png" alt="TarkovLab" /></a>
         <nav>
-          <a href="/" class="on">Quests</a>
+          <a href="/" class="on">Home</a>
           <a href="/achievements">Achievements</a>
         </nav>
         <div class="status" id="status"><span class="dot"></span><span id="stxt">CONNECTING</span></div>
       </header>
-
-      <h1>Quests</h1>
-      <p class="sub">Escape from Tarkov tasks with objectives, rewards and requirements.</p>
-
-      <div class="toolbar">
-        <div class="search">
-          <span class="ic">⌕</span>
-          <input id="search" type="text" placeholder="Search by quest, trader or objective..." autocomplete="off" />
-        </div>
-        <div class="count" id="count">Loading...</div>
-      </div>
-
-      <div class="filters" id="filters" style="margin-bottom:18px;">
-        <button class="fbtn on" data-t="all">All</button>
-        <button class="fbtn" data-t="prapor">Prapor</button>
-        <button class="fbtn" data-t="therapist">Therapist</button>
-        <button class="fbtn" data-t="skier">Skier</button>
-        <button class="fbtn" data-t="peacekeeper">Peacekeeper</button>
-        <button class="fbtn" data-t="mechanic">Mechanic</button>
-        <button class="fbtn" data-t="ragman">Ragman</button>
-        <button class="fbtn" data-t="jaeger">Jaeger</button>
-        <button class="fbtn" data-t="fence">Fence</button>
-        <button class="fbtn" data-t="lightkeeper">Lightkeeper</button>
-      </div>
-
-      <div class="cols">
-        <div class="qlist" id="qlist">
-          <div class="state"><div class="spin"></div>Loading quests...</div>
-        </div>
-        <aside class="detail" id="detail">
-          <div class="empty" id="empty"><span class="t">No quest selected</span>Select a quest to view its details.</div>
-          <div id="body" style="display:none;">
-            <div class="dhead" id="dhead"></div>
-            <div class="sec"><div class="h">Briefing</div><div id="wiki"></div></div>
-            <div class="sec"><div class="h">Objectives</div><ul class="lst" id="objs"></ul></div>
-            <div class="sec"><div class="h w">Rewards</div><ul class="lst w" id="rews"></ul></div>
-            <div class="sec"><div class="h m">Requirements</div><div class="req" id="reqs"></div></div>
-          </div>
-        </aside>
-      </div>
+      <div id="app"></div>
     </div>
-
-    <script src="/js/quests.js?v=3"></script>
+    <script src="/js/app.js"></script>
+    <script src="/js/achievements.js"></script>
+    <script src="/js/achievement.js"></script>
   </body>
 </html>
