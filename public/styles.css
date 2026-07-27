@@ -344,6 +344,27 @@ ul.lst.w li::before { color: var(--orange); }
 .home-arrow { font-size: 1.2rem; color: var(--dim); flex-shrink: 0; }
 .home-card:hover .home-arrow { color: var(--gold); }
 
+/* Maps grid */
+.maps-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; }
+
+.map-btn {
+  position:relative; display:flex; align-items:flex-end; justify-content:center;
+  height:180px; border:1px solid var(--line); background:var(--panel);
+  background-size:cover; background-position:center; overflow:hidden;
+  transition:border-color 0.15s, transform 0.15s; cursor:pointer;
+}
+.map-btn:hover { border-color:var(--gold); transform:scale(1.02); z-index:1; }
+.map-btn::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%);
+}
+.map-btn-label {
+  position:relative; z-index:1;
+  font-family:'Oswald',sans-serif; font-weight:600; font-size:1.05rem;
+  letter-spacing:0.06em; text-transform:uppercase; color:var(--text);
+  padding:14px 16px; text-shadow:0 1px 6px rgba(0,0,0,0.8); width:100%; text-align:center;
+}
+
 /* Responsive */
 @media (max-width: 1000px) {
   .cols { grid-template-columns: 1fr; }
