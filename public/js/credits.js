@@ -1,25 +1,34 @@
-App.registerPage("/credits", "Credits", "Contributors to TarkovLab and TarkovData.", "/assets/icon.png");
-
 function renderCredits() {
   document.title = "TarkovLab | Credits";
   App.render(
     '<h1>Credits</h1>' +
     '<p class="sub">People who contribute to the TarkovLab ecosystem.</p>' +
     '<div id="credits-app"></div>' +
+    '<div id="credits-api"></div>' +
     '<div id="credits-data"></div>'
   );
 
-  fetch("https://api.github.com/repos/tarkovlab/tarkovlab/contributors")
+  fetch("https://api.github.com/repos/TarkovLab/TarkovLab/contributors")
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function (users) {
-      renderContributors("tarkovlab-app", "TarkovLab (App)", users);
+      renderContributors("credits-app", "TarkovLab", users);
     })
     .catch(function () {
       var el = App.$("credits-app");
       if (el) el.innerHTML = '<div class="state err"><span class="t">Failed to load</span>Could not fetch contributors.</div>';
     });
 
-  fetch("https://api.github.com/repos/tarkovlab/tarkovdata/contributors")
+  fetch("https://api.github.com/repos/TarkovLab/TarkovLab-API/contributors")
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (users) {
+      renderContributors("credits-api", "TarkovLab API", users);
+    })
+    .catch(function () {
+      var el = App.$("credits-api");
+      if (el) el.innerHTML = '<div class="state err"><span class="t">Failed to load</span>Could not fetch contributors.</div>';
+    });
+
+  fetch("https://api.github.com/repos/TarkovLab/TarkovData/contributors")
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function (users) {
       renderContributors("credits-data", "TarkovData", users);
