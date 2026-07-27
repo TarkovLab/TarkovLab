@@ -54,7 +54,7 @@ function renderMapsGrid(files) {
     var label = displayName(name);
     var url = MAPS_DATA + "/" + file;
     html +=
-      '<a href="' + App.esc(url) + '" target="_blank" rel="noopener" class="map-btn" style="background-image:url(' + App.esc(url) + ')">' +
+      '<a href="/map?id=' + App.esc(name) + '" class="map-btn" style="background-image:url(' + App.esc(url) + ')">' +
         '<span class="map-btn-label">' + App.esc(label) + '</span>' +
       '</a>';
   }

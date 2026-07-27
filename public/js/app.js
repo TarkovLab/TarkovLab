@@ -93,6 +93,9 @@ var App = (function () {
       renderHome();
     } else if (path === "/maps") {
       renderMaps();
+    } else if (path === "/map") {
+      var id = new URLSearchParams(search).get("id");
+      renderMap(id);
     } else if (path === "/achievements") {
       renderAchievements();
     } else if (path === "/achievement") {
