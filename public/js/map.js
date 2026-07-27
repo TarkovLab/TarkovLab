@@ -18,12 +18,10 @@ function renderMap(id) {
   fetch("https://data.tarkovlab.org/maps/" + encodeURIComponent(id) + ".svg")
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
     .then(function (svgText) {
-      App.setStatus(true);
       setupMapViewer(id, svgText, displayName);
     })
     .catch(function (e) {
       console.error("Failed to load map:", e.message);
-      App.setStatus(false);
       var container = App.$("map-container");
       if (container) container.innerHTML = '<div class="state err"><span class="t">Failed to load</span>' + App.esc(e.message) + '</div>';
     });
@@ -156,20 +154,11 @@ function setupMapCredit(displayName) {
 }
 
 function setupPanZoom(svgEl, container) {
-  var viewBox = svgEl.getAttribute("viewBox");
-  if (!viewBox) return;
-  var vbParts = viewBox.split(/[\s,]+/).map(Number);
-  var vb = { x: vbParts[0], y: vbParts[1], w: vbParts[2], h: vbParts[3] };
-  var scale = 1;
   var panning = false;
   var startX, startY, startVbX, startVbY;
 
-  function applyViewBox() {
-    var sw = vb.w / scale;
-    var sh = vb.h / scale;
-    var cx = vb.x + vb.w / 2;
-    var cy = vb.y + vb.h / 2;
-    svgEl.setAttribute("viewBox", (cx - sw / 2) + " " + (cy - sh / 2) + " " + sw + " " + sh);
+  function getVb() {
+    return svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
   }
 
   container.addEventListener("wheel", function (e) {
@@ -177,13 +166,12 @@ function setupPanZoom(svgEl, container) {
     var rect = container.getBoundingClientRect();
     var mx = (e.clientX - rect.left) / rect.width;
     var my = (e.clientY - rect.top) / rect.height;
-    var factor = e.deltaY > 0 ? 1.15 : 0.85;
-    scale *= factor;
-    scale = Math.max(0.3, Math.min(20, scale));
-    var sw = vb.w / scale;
-    var sh = vb.h / scale;
-    var cx = (vb.x + mx * vb.w);
-    var cy = (vb.y + my * vb.h);
+    var cur = getVb();
+    var factor = e.deltaY > 0 ? 0.85 : 1.15;
+    var sw = cur[2] * factor;
+    var sh = cur[3] * factor;
+    var cx = cur[0] + mx * cur[2];
+    var cy = cur[1] + my * cur[3];
     svgEl.setAttribute("viewBox", (cx - sw / 2) + " " + (cy - sh / 2) + " " + sw + " " + sh);
   }, { passive: false });
 
@@ -192,9 +180,9 @@ function setupPanZoom(svgEl, container) {
     panning = true;
     startX = e.clientX;
     startY = e.clientY;
-    var vb2 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-    startVbX = vb2[0];
-    startVbY = vb2[1];
+    var cur = getVb();
+    startVbX = cur[0];
+    startVbY = cur[1];
     container.style.cursor = "grabbing";
     e.preventDefault();
   });
@@ -203,37 +191,27 @@ function setupPanZoom(svgEl, container) {
     if (!panning) return;
     var dx = (e.clientX - startX) / container.clientWidth;
     var dy = (e.clientY - startY) / container.clientHeight;
-    var vb3 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-    var sw = vb3[2], sh = vb3[3];
-    svgEl.setAttribute("viewBox", (startVbX - dx * sw) + " " + (startVbY - dy * sh) + " " + sw + " " + sh);
+    var cur = getVb();
+    svgEl.setAttribute("viewBox", (startVbX - dx * cur[2]) + " " + (startVbY - dy * cur[3]) + " " + cur[2] + " " + cur[3]);
   });
 
   window.addEventListener("mouseup", function () {
-    if (panning) {
-      panning = false;
-      container.style.cursor = "default";
-      var vb4 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-      vb.x = vb4[0];
-      vb.y = vb4[1];
-    }
+    panning = false;
+    container.style.cursor = "default";
   });
 
-  // Double-click to zoom in
   container.addEventListener("dblclick", function (e) {
     var rect = container.getBoundingClientRect();
     var mx = (e.clientX - rect.left) / rect.width;
     var my = (e.clientY - rect.top) / rect.height;
-    scale *= 2;
-    scale = Math.min(20, scale);
-    var sw = vb.w / scale;
-    var sh = vb.h / scale;
-    var cx = (vb.x + mx * vb.w);
-    var cy = (vb.y + my * vb.h);
+    var cur = getVb();
+    var sw = cur[2] * 0.5;
+    var sh = cur[3] * 0.5;
+    var cx = cur[0] + mx * cur[2];
+    var cy = cur[1] + my * cur[3];
     svgEl.setAttribute("viewBox", (cx - sw / 2) + " " + (cy - sh / 2) + " " + sw + " " + sh);
   });
 
-  // Touch support
-  var touches = [];
   var lastTouchDist = 0;
 
   container.addEventListener("touchstart", function (e) {
@@ -241,12 +219,11 @@ function setupPanZoom(svgEl, container) {
       panning = true;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      var vb2 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-      startVbX = vb2[0];
-      startVbY = vb2[1];
+      var cur = getVb();
+      startVbX = cur[0];
+      startVbY = cur[1];
     } else if (e.touches.length === 2) {
-      var t = e.touches;
-      lastTouchDist = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
     }
   }, { passive: true });
 
@@ -254,22 +231,19 @@ function setupPanZoom(svgEl, container) {
     if (e.touches.length === 1 && panning) {
       var dx = (e.touches[0].clientX - startX) / container.clientWidth;
       var dy = (e.touches[0].clientY - startY) / container.clientHeight;
-      var vb3 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-      var sw = vb3[2], sh = vb3[3];
-      svgEl.setAttribute("viewBox", (startVbX - dx * sw) + " " + (startVbY - dy * sh) + " " + sw + " " + sh);
+      var cur = getVb();
+      svgEl.setAttribute("viewBox", (startVbX - dx * cur[2]) + " " + (startVbY - dy * cur[3]) + " " + cur[2] + " " + cur[3]);
       e.preventDefault();
     } else if (e.touches.length === 2) {
-      var t = e.touches;
-      var dist = Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+      var dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
       if (lastTouchDist > 0) {
         var factor = lastTouchDist / dist;
-        scale *= factor;
-        scale = Math.max(0.3, Math.min(20, scale));
-        var sw2 = vb.w / scale;
-        var sh2 = vb.h / scale;
-        var cx = vb.x + vb.w / 2;
-        var cy = vb.y + vb.h / 2;
-        svgEl.setAttribute("viewBox", (cx - sw2 / 2) + " " + (cy - sh2 / 2) + " " + sw2 + " " + sh2);
+        var cur = getVb();
+        var sw = cur[2] * factor;
+        var sh = cur[3] * factor;
+        var cx = cur[0] + cur[2] / 2;
+        var cy = cur[1] + cur[3] / 2;
+        svgEl.setAttribute("viewBox", (cx - sw / 2) + " " + (cy - sh / 2) + " " + sw + " " + sh);
       }
       lastTouchDist = dist;
       e.preventDefault();
@@ -278,8 +252,5 @@ function setupPanZoom(svgEl, container) {
 
   container.addEventListener("touchend", function () {
     panning = false;
-    var vb4 = svgEl.getAttribute("viewBox").split(/[\s,]+/).map(Number);
-    vb.x = vb4[0];
-    vb.y = vb4[1];
   }, { passive: true });
 }

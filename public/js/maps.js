@@ -23,7 +23,6 @@ function renderMaps() {
   fetch(MAPS_DATA + "/")
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function (j) {
-      App.setStatus(true);
       if (!j.files) throw new Error("No files");
       var mapFiles = j.files.filter(function (f) { return f.indexOf("maps/") === 0 && f.endsWith(".svg"); });
       renderMapsGrid(mapFiles);

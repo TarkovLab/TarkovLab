@@ -263,12 +263,10 @@ function renderAchievements() {
     .then(function (j) {
       if (!j.data || !j.data.achievements) throw new Error("Empty dataset");
       achState.all = j.data.achievements;
-      App.setStatus(true);
       achRenderTable();
     })
     .catch(function (e) {
       console.error("Failed to load achievements:", e.message);
-      App.setStatus(false);
       var se = App.$("ach-sections");
       if (se) se.innerHTML = '<div class="state err"><span class="t">Connection failed</span>Could not reach api.tarkovlab.org.</div>';
     });

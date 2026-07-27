@@ -19,13 +19,11 @@ function renderAchievement(id) {
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
     .then(function (j) {
       if (!j.data || !j.data.achievement) throw new Error("Not found");
-      App.setStatus(true);
       achRenderDetail(j.data.achievement);
       document.title = "TarkovLab | " + j.data.achievement.name;
     })
     .catch(function (e) {
       console.error("Failed to load achievement:", e.message);
-      App.setStatus(false);
       var de = App.$("ach-detail");
       if (de) de.innerHTML = '<div class="state err"><span class="t">Failed to load</span>' + App.esc(e.message) + '</div>';
     });

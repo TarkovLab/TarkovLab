@@ -13,12 +13,6 @@ var App = (function () {
     });
   }
 
-  function setStatus(online) {
-    var el = $("status"), txt = $("stxt");
-    if (el) el.className = "status " + (online ? "on" : "off");
-    if (txt) txt.textContent = online ? "API ONLINE" : "API OFFLINE";
-  }
-
   function copyToClipboard(text) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).catch(function () { fallbackCopy(text); });
@@ -98,6 +92,10 @@ var App = (function () {
       renderMap(id);
     } else if (path === "/achievements") {
       renderAchievements();
+    } else if (path === "/credits") {
+      renderCredits();
+    } else if (path === "/support-ukraine") {
+      renderSupportUkraine();
     } else if (path === "/achievement") {
       var id = new URLSearchParams(search).get("id");
       renderAchievement(id);
@@ -127,7 +125,6 @@ var App = (function () {
 
   document.addEventListener("DOMContentLoaded", function () {
     route();
-    setStatus(false);
   });
 
   return {
@@ -135,7 +132,6 @@ var App = (function () {
     FALLBACK: FALLBACK,
     $: $,
     esc: esc,
-    setStatus: setStatus,
     copyToClipboard: copyToClipboard,
     showCopied: showCopied,
     render: render,
