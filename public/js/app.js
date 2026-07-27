@@ -91,6 +91,8 @@ var App = (function () {
 
     if (path === "/" || path === "") {
       renderHome();
+    } else if (path === "/maps") {
+      renderMaps();
     } else if (path === "/achievements") {
       renderAchievements();
     } else if (path === "/achievement") {
