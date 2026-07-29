@@ -5,5 +5,8 @@
   "description": "TarkovLab web app for Escape from Tarkov (quests & achievements).",
   "scripts": {
     "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
   }
 }
