@@ -117,7 +117,7 @@ var App = (function () {
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest("a");
-    if (a && a.host === window.location.host && a.getAttribute("href") !== "#") {
+    if (a && a.host === window.location.host && a.getAttribute("href") !== "#" && a.pathname.indexOf('/auth/') !== 0) {
       e.preventDefault();
       navigate(a.pathname + a.search);
     }
