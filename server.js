@@ -3,6 +3,7 @@ const https = require('node:https');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+require('dotenv').config();
 
 const port = process.env.PORT || 3000;
 const publicDir = path.join(__dirname, 'public');
@@ -11,7 +12,7 @@ const indexHtml = path.join(publicDir, 'index.html');
 const authentikDomain = process.env.AUTHENTIK_DOMAIN;
 const clientId = process.env.AUTHENTIK_CLIENT_ID;
 const clientSecret = process.env.AUTHENTIK_CLIENT_SECRET;
-const redirectUri = process.env.AUTHENTIK_REDIRECT_URI;
+const redirectUri = process.env.AUTHENTIK_REDIRECT_URI || 'http://localhost:3000/auth/callback';
 const authEnabled = !!(authentikDomain && clientId && clientSecret);
 
 const sessions = new Map();
