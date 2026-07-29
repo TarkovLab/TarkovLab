@@ -21,7 +21,7 @@ var Auth = (function () {
     var navSettings = document.getElementById("nav-settings");
     if (!el) return;
     if (user) {
-      var name = user.preferred_username || user.name || user.nickname || user.sub || "User";
+      var name = user.user_metadata && user.user_metadata.display_name || user.email || user.id || "User";
       el.innerHTML =
         '<a href="/settings" class="auth-user">' + App.esc(name) + '</a>' +
         '<a href="/auth/logout" class="auth-btn">Logout</a>';

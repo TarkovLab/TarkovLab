@@ -77,11 +77,71 @@ server.js             Static file server with clean-URL routing
 
 ---
 
-## Running Locally
+## Authentication
 
-Start the local Node.js server:
+TarkovLab uses **Supabase Auth** with email/password sign-in. Users are managed through your Supabase project dashboard (Authentication → Users).
+
+### Supabase Setup
+
+1. Create a project at [supabase.com](https://supabase.com)
+2. In your project dashboard, go to **Authentication → Providers** and ensure **Email** is enabled
+3. Go to **Project Settings → API** to find your credentials
+
+---
+
+## Database Setup
+
+Authentication requires a Supabase project. The app itself has **no database** — it fetches game data from the TarkovLab GraphQL API. The only persisted data is user sessions (stored in-memory on the server).
+
+### 1. Create a Supabase project
+
+- Go to [supabase.com](https://supabase.com) and sign up/in
+- Create a new project
+- Once created, note your **Project URL** and **anon public key** from **Project Settings → API**
+
+### 2. Configure environment variables
+
+Copy `.env.example` to `.env` and fill in your Supabase credentials:
 
 ```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-anon-public-key
+```
+
+| Variable | Where to find it |
+|----------|------------------|
+| `SUPABASE_URL` | Project Settings → API → Project URL |
+| `SUPABASE_ANON_KEY` | Project Settings → API → anon public key |
+
+### 3. Create a user
+
+In the Supabase dashboard:
+
+1. Go to **Authentication → Users**
+2. Click **Add User** → create a user with email and password
+3. The user can now sign in at `/auth/login`
+
+### What you need to send me
+
+To make the `.env` file work, I need from you:
+
+1. **`SUPABASE_URL`** – Your project URL (e.g. `https://abcdefghijkl.supabase.co`)
+2. **`SUPABASE_ANON_KEY`** – The anon public key from your project settings
+
+These are the only two values required to enable authentication.
+
+---
+
+## Running Locally
+
+```bash
+npm install
 npm start
 ```
 
