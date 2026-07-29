@@ -99,6 +99,8 @@ var App = (function () {
     } else if (path === "/achievement") {
       var id = new URLSearchParams(search).get("id");
       renderAchievement(id);
+    } else if (path === "/settings") {
+      renderSettings();
     } else {
       render('<div class="state err"><span class="t">404</span>Page not found.</div>');
     }

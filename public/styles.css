@@ -374,6 +374,34 @@ ul.lst.w li::before { color: var(--orange); }
 }
 .status-link:hover { color:var(--text); border-color:var(--gold); }
 
+/* Auth */
+#auth-section {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.auth-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 16px;
+  border: 1px solid var(--line-2);
+  transition: color 0.12s, border-color 0.12s;
+}
+.auth-btn:hover { color: var(--text); border-color: var(--gold); }
+.auth-user {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gold-2);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.auth-user:hover { color: var(--text); }
+
 /* Footer */
 footer { margin-top:40px; background:rgba(18,18,18,.85); border-top:1px solid rgba(210,175,120,.12); padding:24px 0 20px; }
 footer .fw { padding:0 28px; }
