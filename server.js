@@ -186,11 +186,12 @@ const server = http.createServer(async (req, res) => {
           res.end();
           return;
         }
-        const sid = createSession({
-          id: data.user.id,
-          email: data.user.email,
-          user_metadata: data.user.user_metadata || {},
-        });
+          const sid = createSession({
+            id: data.user.id,
+            email: data.user.email,
+            username: data.user.email,
+            user_metadata: data.user.user_metadata || {},
+          });
         setCookie(res, 'session_id', sid, { httpOnly: true, sameSite: 'Lax', path: '/' });
         res.writeHead(302, { Location: '/' });
         res.end();
@@ -232,10 +233,13 @@ const server = http.createServer(async (req, res) => {
           if (!access_token) throw new Error('missing token');
           const data = await supabaseRequest('/auth/v1/user', 'GET', null, access_token);
           if (!data.id) throw new Error('invalid token');
+          const meta = data.user_metadata || {};
+          const googleName = meta.full_name || meta.name || meta.display_name || data.email;
           const sid = createSession({
             id: data.id,
             email: data.email,
-            user_metadata: data.user_metadata || {},
+            username: googleName,
+            user_metadata: meta,
           });
           setCookie(res, 'session_id', sid, { httpOnly: true, sameSite: 'Lax', path: '/' });
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -272,6 +276,34 @@ const server = http.createServer(async (req, res) => {
     }
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ authenticated: true, user: session.user }));
+    return;
+  }
+
+  if (authEnabled && pathname === '/auth/update-username' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try {
+        const session = getSession(req);
+        if (!session) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Not authenticated' }));
+          return;
+        }
+        const { username } = JSON.parse(body);
+        if (!username || typeof username !== 'string' || username.trim().length === 0) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Invalid username' }));
+          return;
+        }
+        session.user.username = username.trim();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, username: session.user.username }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: false, error: 'Invalid request' }));
+      }
+    });
     return;
   }
 
