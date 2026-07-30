@@ -331,6 +331,16 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (authEnabled && pathname === '/auth/diag') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      ok: true,
+      hasServiceKey: !!supabaseServiceKey,
+      version: 'update-username-v2',
+    }));
+    return;
+  }
+
   if (pathname === '/') {
     sendFile(res, indexHtml);
     return;
