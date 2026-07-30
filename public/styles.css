@@ -402,6 +402,64 @@ ul.lst.w li::before { color: var(--orange); }
 }
 .auth-user:hover { color: var(--text); }
 
+/* Settings */
+.setting-group {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 24px;
+  margin-bottom: 16px;
+  max-width: 480px;
+}
+.setting-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.setting-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.setting-input {
+  flex: 1;
+  background: var(--panel-2);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  outline: none;
+}
+.setting-input:focus {
+  border-color: var(--gold);
+}
+.setting-btn {
+  background: var(--gold);
+  border: none;
+  color: var(--bg);
+  font-family: 'Oswald', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 10px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.setting-btn:hover {
+  background: var(--gold-2);
+}
+.setting-msg {
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+.setting-msg.ok { color: var(--gold); }
+.setting-msg.err { color: var(--orange); }
+
 /* Footer */
 footer { margin-top:40px; background:rgba(18,18,18,.85); border-top:1px solid rgba(210,175,120,.12); padding:24px 0 20px; }
 footer .fw { padding:0 28px; }

@@ -37,7 +37,7 @@ body{background:#0a0a0a;color:#c8c3b6;font-family:'Rajdhani',sans-serif;min-heig
   .then(function(r) { return r.json(); })
   .then(function(data) {
     if (data.ok) {
-      window.location.href = '/settings';
+      window.location.href = '/';
     } else {
       window.location.href = '/auth/login?error=oauth';
     }
