@@ -186,11 +186,13 @@ const server = http.createServer(async (req, res) => {
           res.end();
           return;
         }
+          const meta = data.user.user_metadata || {};
           const sid = createSession({
             id: data.user.id,
             email: data.user.email,
-            username: data.user.email,
-            user_metadata: data.user.user_metadata || {},
+            username: meta.username || data.user.email,
+            user_metadata: meta,
+            access_token: data.access_token,
           });
         setCookie(res, 'session_id', sid, { httpOnly: true, sameSite: 'Lax', path: '/' });
         res.writeHead(302, { Location: '/' });
@@ -238,8 +240,9 @@ const server = http.createServer(async (req, res) => {
           const sid = createSession({
             id: data.id,
             email: data.email,
-            username: googleName,
+            username: meta.username || googleName,
             user_metadata: meta,
+            access_token,
           });
           setCookie(res, 'session_id', sid, { httpOnly: true, sameSite: 'Lax', path: '/' });
           res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -296,9 +299,28 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify({ ok: false, error: 'Invalid username' }));
           return;
         }
-        session.user.username = username.trim();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ ok: true, username: session.user.username }));
+        const token = session.user.access_token;
+        if (!token) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'No access token available' }));
+          return;
+        }
+        const newUsername = username.trim();
+        const supabaseBody = JSON.stringify({ data: { username: newUsername } });
+        supabaseRequest('/auth/v1/user', 'PATCH', supabaseBody, token)
+          .then(function (supaData) {
+            session.user.username = newUsername;
+            if (session.user.user_metadata) {
+              session.user.user_metadata.username = newUsername;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true, username: newUsername }));
+          })
+          .catch(function (err) {
+            console.error('Supabase update error:', err);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: false, error: 'Failed to save username' }));
+          });
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: 'Invalid request' }));
