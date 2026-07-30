@@ -11,6 +11,7 @@ const indexHtml = path.join(publicDir, 'index.html');
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const authEnabled = !!(supabaseUrl && supabaseAnonKey);
 
 const sessions = new Map();
@@ -299,29 +300,54 @@ const server = http.createServer(async (req, res) => {
           res.end(JSON.stringify({ ok: false, error: 'Invalid username' }));
           return;
         }
-        const token = session.user.access_token;
-        if (!token) {
-          res.writeHead(400, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ ok: false, error: 'No access token available' }));
+        const newUsername = username.trim();
+        if (!supabaseServiceKey) {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'SUPABASE_SERVICE_ROLE_KEY not configured' }));
           return;
         }
-        const newUsername = username.trim();
-        const supabaseBody = JSON.stringify({ data: { username: newUsername } });
-        supabaseRequest('/auth/v1/user', 'PATCH', supabaseBody, token)
-          .then(function (supaData) {
-            session.user.username = newUsername;
-            if (session.user.user_metadata) {
-              session.user.user_metadata.username = newUsername;
+        const adminBody = JSON.stringify({ user_metadata: { username: newUsername } });
+        const url = new URL('/auth/v1/admin/users/' + encodeURIComponent(session.user.id), supabaseUrl);
+        const mod = supabaseUrl.startsWith('https') ? https : http;
+        const opts = {
+          hostname: url.hostname,
+          port: url.port || (url.protocol === 'https:' ? 443 : 80),
+          path: url.pathname + url.search,
+          method: 'PATCH',
+          headers: {
+            'apikey': supabaseServiceKey,
+            'Authorization': 'Bearer ' + supabaseServiceKey,
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(adminBody),
+          },
+        };
+        const supReq = mod.request(opts, function (supRes) {
+          let data = '';
+          supRes.on('data', function (c) { data += c; });
+          supRes.on('end', function () {
+            if (supRes.statusCode >= 200 && supRes.statusCode < 300) {
+              session.user.username = newUsername;
+              if (session.user.user_metadata) {
+                session.user.user_metadata.username = newUsername;
+              }
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ ok: true, username: newUsername }));
+            } else {
+              console.error('Supabase admin error:', supRes.statusCode, data);
+              res.writeHead(500, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ ok: false, error: 'Failed to save username' }));
             }
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: true, username: newUsername }));
-          })
-          .catch(function (err) {
-            console.error('Supabase update error:', err);
-            res.writeHead(500, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ ok: false, error: 'Failed to save username' }));
           });
+        });
+        supReq.on('error', function (err) {
+          console.error('Supabase request error:', err);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ ok: false, error: 'Failed to save username' }));
+        });
+        supReq.write(adminBody);
+        supReq.end();
       } catch (err) {
+        console.error('Update username error:', err);
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ ok: false, error: 'Invalid request' }));
       }
