@@ -1,7 +1,8 @@
 var App = (function () {
   "use strict";
 
-  var API = "https://api.tarkovlab.org/graphql";
+  var API = window.TL_API || "https://api.tarkovlab.org/graphql";
+  var DATA = window.TL_DATA || "https://data.tarkovlab.org";
   var FALLBACK = "/assets/icon.png";
   var pages = [];
 
@@ -90,6 +91,22 @@ var App = (function () {
     } else if (path === "/map") {
       var id = new URLSearchParams(search).get("id");
       renderMap(id);
+    } else if (path === "/quests") {
+      renderQuests();
+    } else if (path.indexOf("/quests/") === 0) {
+      renderQuest(decodeURIComponent(path.replace(/^\/quests\//, "")));
+    } else if (path === "/items") {
+      renderItems();
+    } else if (path.indexOf("/items/") === 0) {
+      renderItem(decodeURIComponent(path.replace(/^\/items\//, "")));
+    } else if (path === "/traders") {
+      renderTraders();
+    } else if (path.indexOf("/traders/") === 0) {
+      renderTrader(decodeURIComponent(path.replace(/^\/traders\//, "")));
+    } else if (path === "/hideout") {
+      renderHideout();
+    } else if (path.indexOf("/hideout/") === 0) {
+      renderHideoutStation(decodeURIComponent(path.replace(/^\/hideout\//, "")));
     } else if (path === "/achievements") {
       renderAchievements();
     } else if (path === "/credits") {
@@ -131,6 +148,7 @@ var App = (function () {
 
   return {
     API: API,
+    DATA: DATA,
     FALLBACK: FALLBACK,
     $: $,
     esc: esc,
