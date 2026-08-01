@@ -16,8 +16,27 @@ function itemMetaRow(label, value) {
 }
 
 function itemIconHtmlBig(item) {
-  return '<img class="item-ic-big" src="' + App.esc(item.imageLink || "") + '" alt="" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-    (item.fallbackIconLink ? ' data-f="' + App.esc(item.fallbackIconLink) + '"' : '') + ' />';
+  var w = item && item.width;
+  var h = item && item.height;
+  var box = "";
+  if (w && h && w > 0 && h > 0) {
+    var cell = 64;
+    var bw = w * cell;
+    var bh = h * cell;
+    var scale = Math.min(1, 192 / Math.max(bw, bh));
+    bw = Math.round(bw * scale);
+    bh = Math.round(bh * scale);
+    box = ' style="width:' + bw + 'px;height:' + bh + 'px;' + tileGridStyle(cell * scale) + '"';
+  }
+  var primary = (item && (item.gridImageLink || item.imageLink)) || "";
+  var fallback = (item && item.gridImageLink && item.imageLink)
+    ? item.imageLink
+    : (item && item.fallbackIconLink) || "";
+  return '<span class="item-grid-big"' + box + '>' +
+    '<img class="item-ic-big" src="' + App.esc(primary) + '" alt="" ' +
+    'onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
+    (fallback ? ' data-f="' + App.esc(fallback) + '"' : '') + ' />' +
+    '</span>';
 }
 
 function itemPrice(n) {
@@ -151,7 +170,7 @@ function renderItem(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var query = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
   fetch(App.API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

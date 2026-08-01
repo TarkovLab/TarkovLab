@@ -141,17 +141,30 @@ function renderHideoutStation(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { id name shortName imageLink fallbackIconLink width height } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { id name shortName imageLink fallbackIconLink width height count } requiredItems { id name shortName imageLink fallbackIconLink width height count } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
+  function loadStation(dims) {
+    var itemFields = dims
+      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
+      : 'id name shortName imageLink fallbackIconLink';
+    var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { ' + itemFields + ' } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { ' + itemFields + ' count } requiredItems { ' + itemFields + ' count } } } }';
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.hideoutStation) throw new Error("Not found");
+        return j.data.hideoutStation;
+      });
+  }
+  loadStation(true).catch(function (e) {
+    console.warn("Hideout station with item sizes unavailable, retrying without:", e.message);
+    return loadStation(false);
   })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.hideoutStation) throw new Error("Not found");
-      hideoutStationRenderDetail(j.data.hideoutStation);
-      document.title = "TarkovLab | " + j.data.hideoutStation.name;
+    .then(function (s) {
+      hideoutStationRenderDetail(s);
+      document.title = "TarkovLab | " + s.name;
     })
     .catch(function (e) {
       console.error("Failed to load station:", e.message);

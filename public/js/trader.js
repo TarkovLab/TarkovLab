@@ -99,17 +99,37 @@ function renderTrader(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { trader(id: "' + safeId + '") { id gameId name imageLink currency resetTime levels { level requiredPlayerLevel requiredReputation payRate insuranceRate } barters { id taskUnlock minTraderLevel restockAmount buyLimit offeredItem { id name shortName imageLink fallbackIconLink width height count } requiredItems { id name shortName imageLink fallbackIconLink width height count } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
+  function loadTrader(opts) {
+    opts = opts || {};
+    var itemFields = opts.dims
+      ? ' id name shortName imageLink fallbackIconLink gridImageLink width height count'
+      : ' id name shortName imageLink fallbackIconLink count';
+    var levelFields = opts.reputation
+      ? 'level requiredPlayerLevel requiredReputation payRate insuranceRate'
+      : 'level requiredPlayerLevel payRate insuranceRate';
+    var query = 'query { trader(id: "' + safeId + '") { id gameId name imageLink currency resetTime levels { ' + levelFields + ' } barters { id taskUnlock minTraderLevel restockAmount buyLimit offeredItem {' + itemFields + '} requiredItems {' + itemFields + '} } } }';
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.trader) throw new Error("Not found");
+        return j.data.trader;
+      });
+  }
+  loadTrader({ dims: true, reputation: true }).catch(function (e) {
+    console.warn("Trader barters with item sizes unavailable, retrying without:", e.message);
+    return loadTrader({ dims: false, reputation: true });
+  }).catch(function (e) {
+    console.warn("Trader reputation fields unavailable, retrying without:", e.message);
+    return loadTrader({ dims: false, reputation: false });
   })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.trader) throw new Error("Not found");
-      traderRenderDetail(j.data.trader);
-      document.title = "TarkovLab | " + j.data.trader.name;
+    .then(function (t) {
+      traderRenderDetail(t);
+      document.title = "TarkovLab | " + t.name;
     })
     .catch(function (e) {
       console.error("Failed to load trader:", e.message);

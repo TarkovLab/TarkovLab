@@ -1,10 +1,35 @@
+function mapNormName(n) {
+  return String(n || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+// Quest data uses lowercase ids (e.g. "the-lab"); map files use canonical names (e.g. "Labs")
+var MAP_NAME_ALIASES = { thelab: "labs" };
+
 function renderMap(id) {
   if (!id) {
     App.render('<div class="state err"><span class="t">No map selected</span>Please select a map from the list.</div>');
     return;
   }
 
-  var displayName = id.replace(/([A-Z])/g, " $1").trim();
+  // Resolve the real SVG file name: quest links may use lowercase ids (e.g. "lighthouse")
+  fetch(App.DATA + "/api/maps")
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (j) {
+      var target = mapNormName(id);
+      if (MAP_NAME_ALIASES[target]) target = MAP_NAME_ALIASES[target];
+      var match = null;
+      for (var i = 0; i < (j.maps || []).length; i++) {
+        if (mapNormName(j.maps[i].name) === target) { match = j.maps[i]; break; }
+      }
+      openMap(match ? match.name : id, match ? match.file : id + ".svg");
+    })
+    .catch(function () {
+      openMap(id, id + ".svg");
+    });
+}
+
+function openMap(canonicalId, file) {
+  var displayName = canonicalId.replace(/([A-Z])/g, " $1").trim();
   document.title = "TarkovLab | " + displayName;
 
   App.render(
@@ -16,7 +41,7 @@ function renderMap(id) {
     '<div id="map-credit" class="map-credit"></div>'
   );
 
-  var svgPromise = fetch(App.DATA + "/maps/" + encodeURIComponent(id) + ".svg")
+  var svgPromise = fetch(App.DATA + "/maps/" + encodeURIComponent(file))
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); });
 
   var dataPromise = fetch(App.API, {
@@ -24,7 +49,7 @@ function renderMap(id) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       query: "query($name: String!) { mapData(name: $name) { map name svg viewBox levels objectiveCount objectives { quest questId questSlug objectiveId type description zoneId x y xPct yPct world { x y z } level outline } extracts { name faction x y xPct yPct world { x y z } outline } zones { zoneId x y xPct yPct world { x y z } outline } interactables { id label kind trigger x y xPct yPct world { x y z } } lights { name type on x y xPct yPct world { x y z } } } }",
-      variables: { name: id }
+      variables: { name: canonicalId }
     })
   })
     .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
@@ -33,12 +58,12 @@ function renderMap(id) {
 
   Promise.all([svgPromise, dataPromise])
     .then(function (results) {
-      setupMapViewer(id, results[0], displayName, results[1]);
+      setupMapViewer(canonicalId, results[0], displayName, results[1]);
     })
     .catch(function (e) {
       console.error("Failed to load map:", e.message);
       var container = App.$("map-container");
-      if (container) container.innerHTML = '<div class="state err"><span class="t">Failed to load</span>' + App.esc(e.message) + '</div>';
+      if (container) container.innerHTML = '<div class="state err"><span class="t">Map unavailable</span>' + App.esc(displayName) + ' has no map file yet.</div>';
     });
 }
 

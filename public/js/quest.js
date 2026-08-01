@@ -55,7 +55,7 @@ function questLocationCount(q) {
 
 function questTraderName(t) {
   if (!t) return "Quest";
-  return String(t).replace(/_/g, " ");
+  return String(t).replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
 }
 
 function questCopyRow(label, value) {
@@ -98,6 +98,32 @@ function questObjHtml(q, o, idx, needed) {
     locations +
     needs +
     '</div>';
+}
+
+function questRewardSetHtml(label, set) {
+  if (!set) return "";
+  var hasItems = set.items && set.items.length > 0;
+  var hasStanding = set.traderStanding && set.traderStanding.length > 0;
+  if (!hasItems && !hasStanding) return "";
+  var html = '<div class="sec"><div class="h">' + App.esc(label) + ' rewards</div>';
+  if (hasItems) {
+    html += '<div class="qst-reward-tiles">' + tileListHtml(set.items) + '</div>';
+  }
+  if (hasStanding) {
+    var pills = set.traderStanding.map(function (s) {
+      var v = Number(s.standing);
+      var sign = v > 0 ? "+" : "";
+      return '<span class="pill map">' + App.esc(questTraderName(s.trader)) + ' ' + sign + v + '</span>';
+    }).join(" ");
+    html += '<div class="qst-reward-standing">' + pills + '</div>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function questRewardsHtml(rewards) {
+  if (!rewards) return "";
+  return questRewardSetHtml("Start", rewards.startRewards) + questRewardSetHtml("Finish", rewards.finishRewards);
 }
 
 var questMiniMapCache = null; // { norm: file } loaded from /api/maps
@@ -172,7 +198,8 @@ function renderQuestMiniMap(svgFile, mapId, quest) {
         var tip = "Objective " + n + ": " + desc + (loc.zoneId ? " (" + loc.zoneId + ")" : "");
         var cx = vbX + (loc.xPct != null ? loc.xPct : 0) * vbW;
         var cy = vbY + (loc.yPct != null ? loc.yPct : 0) * vbH;
-        var r = Math.max(7, vbW / 160);
+        var dispW = Math.min(380, 560 * (vbW / vbH) + 20);
+        var r = Math.max(7, Math.round(vbW * 10 / dispW));
         var c = document.createElementNS(ns, "circle");
         c.setAttribute("cx", cx);
         c.setAttribute("cy", cy);
@@ -187,7 +214,7 @@ function renderQuestMiniMap(svgFile, mapId, quest) {
         num.setAttribute("x", cx);
         num.setAttribute("y", cy);
         num.setAttribute("class", "qst-minimap-num");
-        num.setAttribute("style", "font-size:" + (r * 1.3) + "px");
+        num.setAttribute("style", "font-size:" + (r * 1.6) + "px");
         num.textContent = n;
         g.appendChild(num);
         if (loc.outline && loc.outline.length >= 3) {
@@ -240,7 +267,7 @@ function questMiniMapsHtml(quest) {
   return { html: section, mapIds: mapIds };
 }
 
-function questRenderDetail(q, neededItems) {
+function questRenderDetail(q, neededItems, rewards) {
   var de = App.$("q-detail");
   if (!de) return;
 
@@ -291,6 +318,8 @@ function questRenderDetail(q, neededItems) {
 
   var mini = questMiniMapsHtml(q);
 
+  var rewardsHtml = questRewardsHtml(rewards);
+
   de.innerHTML =
     '<div class="qst-detail">' +
       '<div class="qst-dhead">' +
@@ -320,6 +349,7 @@ function questRenderDetail(q, neededItems) {
       '</div>' +
       (mini ? mini.html : "") +
       objectives +
+      rewardsHtml +
     '</div>';
 
   var btns = de.querySelectorAll(".copy-btn");
@@ -352,21 +382,63 @@ function questRenderDetail(q, neededItems) {
 
 function questFetchNeededItems(id) {
   var safeId = App.esc(id);
-  var query = 'query { quest(id: "' + safeId + '") { neededItems { item { id name shortName imageLink fallbackIconLink width height } count objectiveId objectiveType objectiveDescription } } }';
-  return fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
-  })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.quest || !j.data.quest.neededItems) return [];
-      return j.data.quest.neededItems;
+  function fetchNeeded(dims) {
+    var itemFields = dims
+      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
+      : 'id name shortName imageLink fallbackIconLink';
+    var query = 'query { quest(id: "' + safeId + '") { neededItems { item { ' + itemFields + ' } count objectiveId objectiveType objectiveDescription } } }';
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
     })
-    .catch(function (e) {
-      console.warn("Needed items unavailable:", e.message);
-      return [];
-    });
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.quest || !j.data.quest.neededItems) return [];
+        return j.data.quest.neededItems;
+      });
+  }
+  return fetchNeeded(true).catch(function (e) {
+    console.warn("Needed items with item sizes unavailable, retrying without:", e.message);
+    return fetchNeeded(false);
+  }).catch(function (e) {
+    console.warn("Needed items unavailable:", e.message);
+    return [];
+  });
+}
+
+function questFetchRewards(id) {
+  var safeId = App.esc(id);
+  function fetchRewards(dims) {
+    var itemFields = dims
+      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
+      : 'id name shortName imageLink fallbackIconLink';
+    var query = 'query { quest(id: "' + safeId + '") { startRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } finishRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } } }';
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        return (j.data && j.data.quest) || null;
+      });
+  }
+  return fetchRewards(true).catch(function (e) {
+    console.warn("Quest rewards with item sizes unavailable, retrying without:", e.message);
+    return fetchRewards(false);
+  }).catch(function (e) {
+    console.warn("Quest rewards unavailable:", e.message);
+    return null;
+  });
 }
 
 function renderQuest(id) {
@@ -393,10 +465,11 @@ function renderQuest(id) {
         if (!j.data || !j.data.quest) throw new Error("Not found");
         return j.data.quest;
       }),
-    questFetchNeededItems(id)
+    questFetchNeededItems(id),
+    questFetchRewards(id)
   ])
     .then(function (res) {
-      questRenderDetail(res[0], res[1]);
+      questRenderDetail(res[0], res[1], res[2]);
       document.title = "TarkovLab | " + res[0].name;
     })
     .catch(function (e) {

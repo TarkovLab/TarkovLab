@@ -3,6 +3,16 @@
 var TILE_CELL_PX = 32;
 var TILE_MAX_PX = 96;
 
+// Light grid background (cells + borders) like tarkov.dev item tiles
+function tileGridStyle(cellPx) {
+  cellPx = Math.max(2, Math.round(cellPx || TILE_CELL_PX));
+  return 'background-color:#ece9e1;background-image:' +
+    'linear-gradient(to right, rgba(0,0,0,0.10) 1px, transparent 1px),' +
+    'linear-gradient(to bottom, rgba(0,0,0,0.10) 1px, transparent 1px);' +
+    'background-size:' + cellPx + 'px ' + cellPx + 'px;' +
+    'background-position:-1px -1px;';
+}
+
 function tileBoxStyle(it) {
   var w = it && it.width;
   var h = it && it.height;
@@ -12,12 +22,16 @@ function tileBoxStyle(it) {
   var scale = Math.min(1, TILE_MAX_PX / Math.max(bw, bh));
   bw = Math.round(bw * scale);
   bh = Math.round(bh * scale);
-  return ' style="width:' + bw + 'px;height:' + bh + 'px"';
+  return ' style="width:' + bw + 'px;height:' + bh + 'px;' + tileGridStyle(TILE_CELL_PX * scale) + '"';
 }
 
 function tileImgHtml(it) {
-  return '<img alt="" loading="lazy" src="' + App.esc(it.imageLink || "") + '"' +
-    (it.fallbackIconLink ? ' data-f="' + App.esc(it.fallbackIconLink) + '"' : '') +
+  var primary = it.gridImageLink || it.imageLink || "";
+  var fallback = primary === it.gridImageLink && it.imageLink
+    ? it.imageLink
+    : (it.fallbackIconLink || "");
+  return '<img alt="" loading="lazy" src="' + App.esc(primary) + '"' +
+    (fallback ? ' data-f="' + App.esc(fallback) + '"' : '') +
     ' onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}" />';
 }
 
@@ -30,7 +44,7 @@ function tileItemHtml(it, count, opts) {
     ? '<span class="tile-count">' + Math.round(count) + '</span>'
     : "";
   var fir = opts.fir
-    ? '<span class="tile-fir">FIR</span>'
+    ? '<span class="tile-fir" title="Found in raid">&#10003;</span>'
     : "";
   var box = '<span class="tile-box"' + tileBoxStyle(it) + '>' + (it ? tileImgHtml(it) : "") + badge + fir + '</span>';
   var nameEl = '<span class="tile-name">' + App.esc(name) + '</span>';
