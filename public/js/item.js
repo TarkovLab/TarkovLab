@@ -22,7 +22,7 @@ function itemIconHtmlBig(item) {
   var tdevBase = (item && item.gameId)
     ? "https://assets.tarkov.dev/" + item.gameId + "-base-image.webp"
     : "";
-  var primary = (item && (tdevBase || item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
+  var primary = (item && (item.image512pxLink || tdevBase || item.gridImageLink || item.imageLink)) || "";
   var fallback = (item && tdevBase && (item.image512pxLink || item.gridImageLink))
     ? (item.image512pxLink || item.gridImageLink)
     : (item && (item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
@@ -168,8 +168,8 @@ function renderItem(id) {
   );
 
   var safeId = App.esc(id);
-  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
-  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
   function fetchItem(q) {
     return fetch(App.API, {
       method: "POST",

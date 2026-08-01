@@ -48,17 +48,32 @@ function itemFetch() {
   se.innerHTML = '<div class="state"><div class="spin"></div>Loading items...</div>';
 
   var safe = itemState.query.replace(/["\\]/g, "");
-  var query = 'query { items(search: "' + safe + '", limit: ' + itemState.pageSize + ', offset: ' + itemState.offset + ') { total items { id name shortName types imageLink fallbackIconLink gridImageLink width height neededFor { quests { quest } barters { barter } crafts { craft } } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
+  function fetchItems(withColor) {
+    var query = 'query { items(search: "' + safe + '", limit: ' + itemState.pageSize + ', offset: ' + itemState.offset + ') { total items { id gameId name shortName backgroundColor types imageLink fallbackIconLink gridImageLink image512pxLink width height neededFor { quests { quest } barters { barter } crafts { craft } } } } }';
+    if (!withColor) {
+      query = query.replace(' backgroundColor', '');
+      query = query.replace(' gameId', '');
+      query = query.replace(' image512pxLink', '');
+    }
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.items) throw new Error("Empty dataset");
+        return j.data.items;
+      });
+  }
+  fetchItems(true).catch(function (e) {
+    console.warn("Items query with backgroundColor unavailable, retrying without:", e.message);
+    return fetchItems(false);
   })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.items) throw new Error("Empty dataset");
-      itemState.total = j.data.items.total;
-      var list = j.data.items.items;
+    .then(function (data) {
+      itemState.total = data.total;
+      var list = data.items;
 
       var count = App.$("i-count");
       if (count) {

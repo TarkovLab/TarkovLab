@@ -3,20 +3,24 @@
 function getItemImageCandidates(it) {
   if (!it) return ["/assets/icon.png"];
   var candidates = [];
-  
+
+  // tarkov.dev-style order: base-image (item artwork sized to its slot,
+  // transparent background) first, then the 512px variant for crisp
+  // upscaling, the 64px icon, and only as last resorts the slot-baked
+  // grid-image and any custom links.
   if (it.gameId) {
     candidates.push("https://assets.tarkov.dev/" + it.gameId + "-base-image.webp");
   }
-  if (it.gridImageLink) candidates.push(it.gridImageLink);
   if (it.image512pxLink) candidates.push(it.image512pxLink);
   if (it.gameId) {
-    candidates.push("https://assets.tarkov.dev/" + it.gameId + "-grid-image.webp");
     candidates.push("https://assets.tarkov.dev/" + it.gameId + "-512.webp");
+  }
+  if (it.gameId) {
     candidates.push("https://assets.tarkov.dev/" + it.gameId + "-icon.webp");
   }
   if (it.fallbackIconLink) candidates.push(it.fallbackIconLink);
-  if (it.imageLink && it.imageLink.indexOf("-icon.webp") === -1) candidates.push(it.imageLink);
   if (it.imageLink) candidates.push(it.imageLink);
+  if (it.gridImageLink) candidates.push(it.gridImageLink);
   candidates.push("/assets/icon.png");
 
   var unique = [];
@@ -131,7 +135,8 @@ function tileItemHtml(it, count, opts) {
     dogtagBadge +
     '</span>';
 
-  if (opts.noName) {
+  var showName = opts.showName === true && !opts.noName;
+  if (!showName) {
     if (opts.noLink || !id) return box;
     return '<a href="/items/' + App.esc(id) + '" title="' + App.esc(title) + '">' + box + '</a>';
   }

@@ -143,7 +143,7 @@ function renderHideoutStation(id) {
   var safeId = App.esc(id);
   function loadStation(dims) {
     var itemFields = dims
-      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
+      ? 'id gameId name shortName backgroundColor imageLink fallbackIconLink gridImageLink image512pxLink width height'
       : 'id name shortName imageLink fallbackIconLink';
     var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { ' + itemFields + ' } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { ' + itemFields + ' count } requiredItems { ' + itemFields + ' count } } } }';
     return fetch(App.API, {

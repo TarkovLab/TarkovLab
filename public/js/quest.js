@@ -398,7 +398,7 @@ function questFetchNeededItems(id) {
   var safeId = App.esc(id);
   function fetchNeeded(dims) {
     var itemFields = dims
-      ? 'id gameId name shortName imageLink fallbackIconLink gridImageLink image512pxLink width height'
+      ? 'id gameId name shortName backgroundColor imageLink fallbackIconLink gridImageLink image512pxLink width height'
       : 'id name shortName imageLink fallbackIconLink width height';
     var extraFields = dims ? ' foundInRaid' : '';
     var query = 'query { quest(id: "' + safeId + '") { neededItems { item { ' + itemFields + ' } count objectiveId objectiveType objectiveDescription' + extraFields + ' } } }';
@@ -430,7 +430,7 @@ function questFetchRewards(id) {
   var safeId = App.esc(id);
   function fetchRewards(dims) {
     var itemFields = dims
-      ? 'id gameId name shortName imageLink fallbackIconLink gridImageLink image512pxLink width height'
+      ? 'id gameId name shortName backgroundColor imageLink fallbackIconLink gridImageLink image512pxLink width height'
       : 'id name shortName imageLink fallbackIconLink width height';
     var query = 'query { quest(id: "' + safeId + '") { startRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } finishRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } } }';
     return fetch(App.API, {
