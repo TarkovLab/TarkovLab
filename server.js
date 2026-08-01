@@ -132,11 +132,17 @@ function sendFile(res, filePath) {
       res.end('Not found');
       return;
     }
+    let body = data;
+    if (filePath === indexHtml && (process.env.TL_API || process.env.TL_DATA)) {
+      const inject = '<script>window.TL_API=' + JSON.stringify(process.env.TL_API || null) +
+        ';window.TL_DATA=' + JSON.stringify(process.env.TL_DATA || null) + ';</script>';
+      body = Buffer.from(String(body).replace('</head>', inject + '</head>'));
+    }
     res.writeHead(200, {
       'Content-Type': contentType,
-      'Cache-Control': ext === '.js' ? 'no-cache' : 'public, max-age=3600'
+      'Cache-Control': (ext === '.js' || filePath === indexHtml) ? 'no-cache' : 'public, max-age=3600'
     });
-    res.end(data);
+    res.end(body);
   });
 }
 

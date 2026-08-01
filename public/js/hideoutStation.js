@@ -13,17 +13,7 @@ function hideoutDuration(ms) {
 }
 
 function hideoutItemReqHtml(r) {
-  return '<span class="barter-item">' +
-    (r.item && r.item.imageLink
-      ? '<img class="barter-ic" src="' + App.esc(r.item.imageLink) + '" alt="" loading="lazy" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-        (r.item.fallbackIconLink ? ' data-f="' + App.esc(r.item.fallbackIconLink) + '"' : '') + ' />'
-      : '') +
-    (r.item && r.item.id
-      ? '<a class="barter-name" href="/items/' + App.esc(r.item.id) + '">' + App.esc(r.item.shortName || r.item.name || r.item.id) + '</a>'
-      : '<span class="barter-name">Unknown</span>') +
-    '<span class="barter-count">x' + r.count + '</span>' +
-    (r.foundInRaid ? '<span class="pill">FIR</span>' : '') +
-    '</span>';
+  return tileItemHtml(r.item, r.count > 1 ? r.count : null, { fir: !!r.foundInRaid });
 }
 
 function hideoutStationReqHtml(r) {
@@ -61,7 +51,7 @@ function hideoutStationRenderDetail(s) {
       var lv = s.levels[i];
       var reqs = "";
       if (lv.itemRequirements && lv.itemRequirements.length > 0) {
-        reqs += '<div class="barter-side">' + lv.itemRequirements.map(hideoutItemReqHtml).join(' <span class="barter-plus">+</span> ') + '</div>';
+        reqs += '<div class="barter-side">' + tileRowHtml(lv.itemRequirements) + '</div>';
       }
       var other = "";
       if (lv.stationLevelRequirements && lv.stationLevelRequirements.length > 0) {
@@ -90,16 +80,7 @@ function hideoutStationRenderDetail(s) {
     craftsHtml = '<div class="sec"><div class="h">Crafts <span class="cat-count">' + s.crafts.length + '</span></div>';
     for (var i = 0; i < s.crafts.length; i++) {
       var c = s.crafts[i];
-      var reqs = (c.requiredItems || []).map(function (r) {
-        return '<span class="barter-item">' +
-          (r.imageLink
-            ? '<img class="barter-ic" src="' + App.esc(r.imageLink) + '" alt="" loading="lazy" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-              (r.fallbackIconLink ? ' data-f="' + App.esc(r.fallbackIconLink) + '"' : '') + ' />'
-            : '') +
-          '<a class="barter-name" href="/items/' + App.esc(r.id || "") + '">' + App.esc(r.shortName || r.name || r.id) + '</a>' +
-          (r.count > 1 ? '<span class="barter-count">x' + r.count + '</span>' : '') +
-          '</span>';
-      }).join(' <span class="barter-plus">+</span> ');
+      var reqs = tileRowHtml(c.requiredItems || []);
       craftsHtml += '<div class="barter">' +
         '<div class="barter-head">' +
           '<span class="pill lvl">Level ' + (c.level != null ? c.level : "?") + '</span> ' +
@@ -108,7 +89,7 @@ function hideoutStationRenderDetail(s) {
         '<div class="barter-body">' +
           '<div class="barter-side">' + reqs + '</div>' +
           '<div class="barter-arrow">&#x2192;</div>' +
-          '<div class="barter-side">' + hideoutItemReqHtml({ item: c.productItem, count: c.productItem.count, foundInRaid: false }) + '</div>' +
+          '<div class="barter-side">' + tileItemHtml(c.productItem, c.productItem.count > 1 ? c.productItem.count : null) + '</div>' +
         '</div>' +
         '</div>';
     }
@@ -160,17 +141,30 @@ function renderHideoutStation(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { id name shortName imageLink fallbackIconLink } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { id name shortName imageLink fallbackIconLink count } requiredItems { id name shortName imageLink fallbackIconLink count } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
+  function loadStation(dims) {
+    var itemFields = dims
+      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
+      : 'id name shortName imageLink fallbackIconLink';
+    var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { ' + itemFields + ' } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { ' + itemFields + ' count } requiredItems { ' + itemFields + ' count } } } }';
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.hideoutStation) throw new Error("Not found");
+        return j.data.hideoutStation;
+      });
+  }
+  loadStation(true).catch(function (e) {
+    console.warn("Hideout station with item sizes unavailable, retrying without:", e.message);
+    return loadStation(false);
   })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.hideoutStation) throw new Error("Not found");
-      hideoutStationRenderDetail(j.data.hideoutStation);
-      document.title = "TarkovLab | " + j.data.hideoutStation.name;
+    .then(function (s) {
+      hideoutStationRenderDetail(s);
+      document.title = "TarkovLab | " + s.name;
     })
     .catch(function (e) {
       console.error("Failed to load station:", e.message);
