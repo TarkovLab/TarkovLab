@@ -500,6 +500,72 @@ footer .fw { padding:0 28px; }
 .map-container svg { display:block; }
 .map-container .state { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
 
+.map-tools {
+  display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;
+}
+.map-tools .tl-toggle {
+  font-family:inherit; font-size:0.78rem; font-weight:700;
+  letter-spacing:0.08em; text-transform:uppercase;
+  padding:8px 16px; cursor:pointer;
+  background:var(--bg); border:1px solid var(--line-2);
+  color:var(--dim); transition:color 0.12s, border-color 0.12s, background 0.12s;
+}
+.map-tools .tl-toggle:hover { color:var(--text); background:var(--panel); }
+.map-tools .tl-toggle.on { color:var(--gold-2); border-color:var(--gold-2); background:rgba(154,140,95,0.08); }
+.map-tools .tl-toggle.off { color:var(--dim); border-color:var(--line-2); }
+.map-tools .tl-toggle .cnt {
+  opacity:0.65; font-size:0.7rem; margin-left:4px;
+}
+
+/* Overlay markers drawn inside the SVG (viewBox coordinates) */
+.tl-layer { pointer-events:none; }
+.tl-zone {
+  fill:rgba(255, 170, 60, 0.10); stroke:rgba(255, 170, 60, 0.45);
+  stroke-width:1; vector-effect:non-scaling-stroke; pointer-events:auto;
+}
+.tl-zone:hover { fill:rgba(255, 170, 60, 0.22); stroke:rgba(255, 190, 90, 0.9); }
+.tl-zone-kill {
+  fill:rgba(217, 83, 79, 0.12); stroke:rgba(217, 83, 79, 0.55);
+  stroke-width:1.2; vector-effect:non-scaling-stroke; pointer-events:auto;
+}
+.tl-zone-kill:hover { fill:rgba(217, 83, 79, 0.25); stroke:#ff7a75; }
+.tl-obj {
+  fill:#d9534f; stroke:#8f2f2c; stroke-width:1.5;
+  vector-effect:non-scaling-stroke; pointer-events:auto; cursor:pointer;
+}
+.tl-obj:hover { fill:#ff7a75; stroke:#ffb3b0; }
+.tl-extract {
+  fill:#5cb85c; stroke:#2e6e2e; stroke-width:1.5;
+  vector-effect:non-scaling-stroke; pointer-events:auto;
+}
+.tl-extract:hover { fill:#7ed97e; stroke:#b3ffb3; }
+.tl-extract-pmc { fill:#5cb85c; stroke:#2e6e2e; }
+.tl-extract-pmc:hover { fill:#7ed97e; stroke:#b3ffb3; }
+.tl-extract-scav { fill:#5bc0de; stroke:#2f7d93; }
+.tl-extract-scav:hover { fill:#9adff0; stroke:#c8eef7; }
+.tl-extract-shared { fill:#f0ad4e; stroke:#8a5b1f; }
+.tl-extract-shared:hover { fill:#ffc97a; stroke:#ffdfa8; }
+.tl-interact {
+  fill:#f0ad4e; stroke:#8a5b1f; stroke-width:1.5;
+  vector-effect:non-scaling-stroke; pointer-events:auto;
+}
+.tl-interact:hover { fill:#ffc97a; stroke:#ffdfa8; }
+.tl-light {
+  fill:#66ccff; stroke:none; opacity:0.75; pointer-events:none;
+}
+
+/* Custom tooltip following the mouse over overlay markers */
+.tl-tooltip {
+  position:fixed; z-index:1000; pointer-events:none;
+  background:rgba(12, 14, 16, 0.96); border:1px solid var(--line-2);
+  border-left:3px solid var(--gold); border-radius:4px;
+  padding:8px 12px; max-width:320px; font-size:0.78rem; line-height:1.45;
+  color:var(--text); box-shadow:0 4px 16px rgba(0,0,0,0.5);
+}
+.tl-tooltip strong { color:var(--gold); letter-spacing:0.04em; }
+.tl-tooltip .tip-desc { margin-top:4px; color:var(--dim); }
+.tl-tooltip .tip-meta { margin-top:4px; font-size:0.7rem; color:var(--dim); opacity:0.75; }
+
 .map-levels {
   display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px;
 }
@@ -541,3 +607,105 @@ footer .fw { padding:0 28px; }
   .ach-dmeta { justify-content: center; }
   .ach-id-row { flex-wrap: wrap; }
 }
+
+/* Quests list */
+.fselect {
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--line-2); padding: 10px 12px;
+  font-family: inherit; font-size: 0.85rem; cursor: pointer;
+}
+.fselect:focus { outline: none; border-color: var(--gold); }
+.qst .nm { font-weight: 700; color: var(--text); }
+.qst .ds { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
+.pill.kappa { color: var(--gold); border-color: rgba(210,175,120,0.5); }
+.pill.lk { color: var(--blue); border-color: rgba(91,143,176,0.45); }
+.pill.map { color: var(--blue); border-color: rgba(91,143,176,0.45); }
+.pill.lvl { color: var(--orange); border-color: rgba(192,144,58,0.45); }
+.pill.fac { color: var(--muted); }
+.pill.req { color: var(--text); }
+.pill.opt { color: var(--dim); }
+
+/* Quest detail */
+.qst-detail { border: 1px solid var(--line); background: var(--panel); padding: 30px; }
+.qst-dhead { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 24px; }
+.qst-dcat { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
+.qst-dname { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 600; margin: 0 0 10px; color: var(--text); }
+.qst-dmeta { display: flex; flex-wrap: wrap; gap: 8px; }
+.qst-meta { display: grid; grid-template-columns: 1fr; gap: 0; }
+.qst-meta-row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.qst-meta-row:last-child { border-bottom: none; }
+.qst-meta-label { color: var(--dim); font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; }
+.qst-meta-val { color: var(--text); font-size: 0.9rem; text-align: right; }
+.qst-id { background: #0a0a0a; border: 1px solid var(--line-2); padding: 2px 8px; font-size: 0.78rem; color: var(--muted); }
+.qst-obj { border: 1px solid var(--line); background: #0d0d0c; padding: 16px 18px; margin-bottom: 12px; }
+.qst-obj-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.qst-obj-type { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold-2); }
+.qst-obj-desc { color: var(--text); font-size: 0.92rem; line-height: 1.5; }
+.qst-locs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.qst-loc {
+  font-size: 0.75rem; padding: 5px 10px; border: 1px solid var(--line-2);
+  color: var(--blue); background: rgba(91,143,176,0.07); text-decoration: none;
+}
+.qst-loc:hover { border-color: var(--blue); color: var(--text); }
+.qst-desc { color: var(--muted); line-height: 1.6; }
+
+/* Quest banner */
+.qst-dhead-main { flex: 1; }
+.qst-banner { max-width: 220px; border: 1px solid var(--line); border-radius: 4px; object-fit: cover; }
+
+/* Quest mini maps */
+.qst-minimaps { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.qst-minimap { border: 1px solid var(--line); background: #0d0d0c; }
+.qst-minimap-title { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--line); font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); }
+.qst-minimap-link { font-size: 0.72rem; text-transform: none; letter-spacing: 0.02em; color: var(--blue); text-decoration: none; font-weight: 600; }
+.qst-minimap-link:hover { color: var(--text); }
+.qst-minimap-body { padding: 10px; display: flex; align-items: center; justify-content: center; }
+.qst-minimap-body svg { width: 100%; height: auto; max-height: 380px; background: #0a0a0a; border-radius: 3px; }
+.qst-minimap-dot { fill: var(--gold); stroke: #000; stroke-width: 0.8; }
+.qst-minimap-outline { fill: rgba(210,175,120,0.18); stroke: var(--gold); stroke-width: 0.7; }
+
+/* Items */
+.item-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.item-card { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line); background: var(--panel); padding: 12px 14px; cursor: pointer; transition: border-color 0.15s; }
+.item-card:hover { border-color: var(--gold); }
+.item-ic { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; background: #0a0a0a; border: 1px solid var(--line-2); padding: 4px; }
+.item-ic-big { width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; background: #0a0a0a; border: 1px solid var(--line-2); padding: 8px; }
+.item-card-body { flex: 1; min-width: 0; }
+.item-card-name { font-weight: 700; color: var(--text); font-size: 0.9rem; margin-bottom: 2px; }
+.item-card-sub { color: var(--muted); font-size: 0.75rem; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item-card-foot { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.item-needs { font-size: 0.7rem; color: var(--gold); letter-spacing: 0.04em; }
+.pager { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.pg-btn { background: var(--panel); border: 1px solid var(--line-2); color: var(--text); padding: 7px 14px; cursor: pointer; font-size: 0.85rem; }
+.pg-btn:hover { border-color: var(--gold); color: var(--gold); }
+.pg-info { color: var(--muted); font-size: 0.85rem; }
+
+/* Traders + hideout grid */
+.trader-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.trader-card { border: 1px solid var(--line); background: var(--panel); padding: 16px 14px; text-align: center; cursor: pointer; transition: border-color 0.15s; }
+.trader-card:hover { border-color: var(--gold); }
+.trader-img { width: 72px; height: 72px; object-fit: contain; margin: 0 auto 10px; display: block; }
+.trader-img-big { width: 140px; height: 140px; object-fit: contain; flex-shrink: 0; border: 1px solid var(--line); padding: 10px; background: #0d0d0c; }
+.trader-card-name { font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.trader-card-sub { color: var(--muted); font-size: 0.75rem; }
+
+/* Barter rows */
+.barter { border: 1px solid var(--line); background: #0d0d0c; padding: 12px 14px; margin-bottom: 10px; }
+.barter-head { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.barter-body { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.barter-side { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; flex: 1; min-width: 200px; }
+.barter-arrow { color: var(--gold); font-size: 1.1rem; }
+.barter-plus { color: var(--dim); font-size: 0.9rem; }
+.barter-item { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); background: var(--bg); padding: 4px 8px; }
+.barter-ic { width: 28px; height: 28px; object-fit: contain; background: #0a0a0a; }
+.barter-name { color: var(--blue); text-decoration: none; font-size: 0.82rem; }
+.barter-name:hover { color: var(--text); text-decoration: underline; }
+.barter-count { color: var(--orange); font-weight: 700; font-size: 0.78rem; }
+
+/* Link type labels */
+.qst-obj-type.link { color: var(--blue); text-transform: none; letter-spacing: 0.03em; font-size: 0.88rem; text-decoration: none; }
+.qst-obj-type.link:hover { color: var(--text); text-decoration: underline; }
+
+/* Quest objective numbering */
+.qst-obj-num { width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #0a0a0a; font-weight: 700; font-size: 0.72rem; flex-shrink: 0; }
+.qst-minimap-num { text-anchor: middle; dominant-baseline: central; font-weight: 700; fill: #0a0a0a; pointer-events: none; user-select: none; }

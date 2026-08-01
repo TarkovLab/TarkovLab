@@ -1,6 +1,6 @@
 App.registerPage("/maps", "Maps", "All Escape from Tarkov maps with full credits.", "/assets/icon.png");
 
-var MAPS_DATA = "https://data.tarkovlab.org";
+var MAPS_DATA = App.DATA;
 var MAP_CREDIT = "the-hideout/tarkov-dev-svg-maps";
 var MAP_LICENSE = "CC BY-NC-SA 4.0";
 var MAP_LICENSE_URL = "https://creativecommons.org/licenses/by-nc-sa/4.0/";
