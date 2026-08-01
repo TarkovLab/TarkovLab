@@ -72,7 +72,7 @@ function questMetaRow(label, value) {
 
 function questObjHtml(q, o, idx, needed) {
   var type = questTypeLabel(o.type);
-  var badge = o.optional ? '<span class="pill opt">Optional</span>' : '<span class="pill req">Required</span>';
+  var badge = o.optional ? '<span class="pill opt">Optional</span>' : '';
   var sep = '<span class="qst-obj-sep">&ndash;</span>';
   var locations = "";
   if (o.locations && o.locations.length > 0) {
@@ -352,7 +352,7 @@ function questRenderDetail(q, neededItems) {
 
 function questFetchNeededItems(id) {
   var safeId = App.esc(id);
-  var query = 'query { quest(id: "' + safeId + '") { neededItems { item { id name shortName imageLink fallbackIconLink } count objectiveId objectiveType objectiveDescription } } }';
+  var query = 'query { quest(id: "' + safeId + '") { neededItems { item { id name shortName imageLink fallbackIconLink width height } count objectiveId objectiveType objectiveDescription } } }';
   return fetch(App.API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

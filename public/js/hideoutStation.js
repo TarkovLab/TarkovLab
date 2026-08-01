@@ -141,7 +141,7 @@ function renderHideoutStation(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { id name shortName imageLink fallbackIconLink } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { id name shortName imageLink fallbackIconLink count } requiredItems { id name shortName imageLink fallbackIconLink count } } } }';
+  var query = 'query { hideoutStation(id: "' + safeId + '") { id gameId name imageLink levels { level constructionTime itemRequirements { item { id name shortName imageLink fallbackIconLink width height } count foundInRaid } stationLevelRequirements { station level } traderRequirements { trader value } skillRequirements { name level } } crafts { id duration level productItem { id name shortName imageLink fallbackIconLink width height count } requiredItems { id name shortName imageLink fallbackIconLink width height count } } } }';
   fetch(App.API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

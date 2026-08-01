@@ -99,7 +99,7 @@ function renderTrader(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { trader(id: "' + safeId + '") { id gameId name imageLink currency resetTime levels { level requiredPlayerLevel requiredReputation payRate insuranceRate } barters { id taskUnlock minTraderLevel restockAmount buyLimit offeredItem { id name shortName imageLink fallbackIconLink count } requiredItems { id name shortName imageLink fallbackIconLink count } } } }';
+  var query = 'query { trader(id: "' + safeId + '") { id gameId name imageLink currency resetTime levels { level requiredPlayerLevel requiredReputation payRate insuranceRate } barters { id taskUnlock minTraderLevel restockAmount buyLimit offeredItem { id name shortName imageLink fallbackIconLink width height count } requiredItems { id name shortName imageLink fallbackIconLink width height count } } } }';
   fetch(App.API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
