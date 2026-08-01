@@ -136,7 +136,7 @@ function sendFile(res, filePath) {
     if (filePath === indexHtml && (process.env.TL_API || process.env.TL_DATA)) {
       const inject = '<script>window.TL_API=' + JSON.stringify(process.env.TL_API || null) +
         ';window.TL_DATA=' + JSON.stringify(process.env.TL_DATA || null) + ';</script>';
-      body = Buffer.from(String(body).replace('</body>', inject + '</body>'));
+      body = Buffer.from(String(body).replace('</head>', inject + '</head>'));
     }
     res.writeHead(200, {
       'Content-Type': contentType,

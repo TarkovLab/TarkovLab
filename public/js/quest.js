@@ -100,30 +100,45 @@ function questObjHtml(q, o, idx, needed) {
     '</div>';
 }
 
-function questRewardSetHtml(label, set) {
+function questRewardSetHtml(label, set, experience) {
   if (!set) return "";
   var hasItems = set.items && set.items.length > 0;
   var hasStanding = set.traderStanding && set.traderStanding.length > 0;
   if (!hasItems && !hasStanding) return "";
-  var html = '<div class="sec"><div class="h">' + App.esc(label) + ' rewards</div>';
+  var html = '<div class="sec"><div class="h">' + App.esc(label) + ' rewards' +
+    (experience ? ' <span class="pill xp">+' + Number(experience).toLocaleString() + ' XP</span>' : '') +
+    '</div>';
   if (hasItems) {
     html += '<div class="qst-reward-tiles">' + tileListHtml(set.items) + '</div>';
   }
   if (hasStanding) {
-    var pills = set.traderStanding.map(function (s) {
-      var v = Number(s.standing);
-      var sign = v > 0 ? "+" : "";
-      return '<span class="pill map">' + App.esc(questTraderName(s.trader)) + ' ' + sign + v + '</span>';
-    }).join(" ");
-    html += '<div class="qst-reward-standing">' + pills + '</div>';
+    html += questStandingHtml(set.traderStanding);
   }
   html += '</div>';
   return html;
 }
 
-function questRewardsHtml(rewards) {
+function questStandingHtml(list) {
+  if (!list || list.length === 0) return "";
+  var html = '<div class="qst-reward-standing">';
+  for (var i = 0; i < list.length; i++) {
+    var s = list[i];
+    var v = Number(s.standing);
+    var sign = v > 0 ? "+" : "";
+    var cls = v > 0 ? " up" : (v < 0 ? " down" : "");
+    html += '<span class="qst-standing' + cls + '">' +
+      '<img class="qst-standing-img" src="' + App.esc(s.imageLink || "") + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
+      '<span class="qst-standing-name">' + App.esc(questTraderName(s.trader)) + '</span>' +
+      '<span class="qst-standing-val">' + sign + v + '</span>' +
+      '</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function questRewardsHtml(rewards, experience) {
   if (!rewards) return "";
-  return questRewardSetHtml("Start", rewards.startRewards) + questRewardSetHtml("Finish", rewards.finishRewards);
+  return questRewardSetHtml("Start", rewards.startRewards, experience) + questRewardSetHtml("Finish", rewards.finishRewards, experience);
 }
 
 var questMiniMapCache = null; // { norm: file } loaded from /api/maps
@@ -318,7 +333,7 @@ function questRenderDetail(q, neededItems, rewards) {
 
   var mini = questMiniMapsHtml(q);
 
-  var rewardsHtml = questRewardsHtml(rewards);
+  var rewardsHtml = questRewardsHtml(rewards, q.experience);
 
   de.innerHTML =
     '<div class="qst-detail">' +
@@ -341,7 +356,6 @@ function questRenderDetail(q, neededItems, rewards) {
         questMetaRow("Trader", App.esc(questTraderName(q.trader))) +
         questMetaRow("Map", App.esc(questMapLabel(q.map))) +
         questMetaRow("Minimum level", q.minPlayerLevel != null ? q.minPlayerLevel : "—") +
-        questMetaRow("Experience", q.experience != null ? q.experience.toLocaleString() : "—") +
         questMetaRow("Objectives", questObjectiveCount(q)) +
         questMetaRow("Locations", questLocationCount(q)) +
         questMetaRow("Wiki", wikiLink) +
@@ -384,9 +398,10 @@ function questFetchNeededItems(id) {
   var safeId = App.esc(id);
   function fetchNeeded(dims) {
     var itemFields = dims
-      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
-      : 'id name shortName imageLink fallbackIconLink';
-    var query = 'query { quest(id: "' + safeId + '") { neededItems { item { ' + itemFields + ' } count objectiveId objectiveType objectiveDescription } } }';
+      ? 'id gameId name shortName imageLink fallbackIconLink gridImageLink image512pxLink width height'
+      : 'id name shortName imageLink fallbackIconLink width height';
+    var extraFields = dims ? ' foundInRaid' : '';
+    var query = 'query { quest(id: "' + safeId + '") { neededItems { item { ' + itemFields + ' } count objectiveId objectiveType objectiveDescription' + extraFields + ' } } }';
     return fetch(App.API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -415,8 +430,8 @@ function questFetchRewards(id) {
   var safeId = App.esc(id);
   function fetchRewards(dims) {
     var itemFields = dims
-      ? 'id name shortName imageLink fallbackIconLink gridImageLink width height'
-      : 'id name shortName imageLink fallbackIconLink';
+      ? 'id gameId name shortName imageLink fallbackIconLink gridImageLink image512pxLink width height'
+      : 'id name shortName imageLink fallbackIconLink width height';
     var query = 'query { quest(id: "' + safeId + '") { startRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } finishRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } } }';
     return fetch(App.API, {
       method: "POST",

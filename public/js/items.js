@@ -28,8 +28,9 @@ function itemCardHtml(item) {
   var needsBadge = needs > 0
     ? '<span class="item-needs">' + needs + ' need' + (needs > 1 ? "s" : "") + '</span>'
     : "";
+  var tileBox = tileItemHtml(item, null, { noLink: true, noName: true });
   return '<div class="item-card" data-href="/items/' + App.esc(item.id) + '">' +
-    itemIconHtml(item) +
+    tileBox +
     '<div class="item-card-body">' +
       '<div class="item-card-name">' + App.esc(item.shortName || item.name || item.id) + '</div>' +
       '<div class="item-card-sub">' + App.esc(item.name || "") + '</div>' +
@@ -47,7 +48,7 @@ function itemFetch() {
   se.innerHTML = '<div class="state"><div class="spin"></div>Loading items...</div>';
 
   var safe = itemState.query.replace(/["\\]/g, "");
-  var query = 'query { items(search: "' + safe + '", limit: ' + itemState.pageSize + ', offset: ' + itemState.offset + ') { total items { id name shortName types imageLink fallbackIconLink neededFor { quests { quest } barters { barter } crafts { craft } } } } }';
+  var query = 'query { items(search: "' + safe + '", limit: ' + itemState.pageSize + ', offset: ' + itemState.offset + ') { total items { id name shortName types imageLink fallbackIconLink gridImageLink width height neededFor { quests { quest } barters { barter } crafts { craft } } } } }';
   fetch(App.API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

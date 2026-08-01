@@ -670,11 +670,11 @@ footer .fw { padding:0 28px; }
 .item-ic { width: 42px; height: 42px; object-fit: contain; flex-shrink: 0; background: #0a0a0a; border: 1px solid var(--line-2); padding: 4px; }
 .item-grid-big {
   position: relative; display: inline-flex; align-items: center; justify-content: center;
-  background-color: #ece9e1;
-  outline: 1px solid #7a7469;
+  background-color: #353535;
+  outline: 2px solid #495154;
   flex-shrink: 0;
 }
-.item-ic-big { width: 96px; height: 96px; object-fit: contain; flex-shrink: 0; }
+.item-ic-big { width: 100%; height: 100%; object-fit: contain; flex-shrink: 0; }
 .item-card-body { flex: 1; min-width: 0; }
 .item-card-name { font-weight: 700; color: var(--text); font-size: 0.9rem; margin-bottom: 2px; }
 .item-card-sub { color: var(--muted); font-size: 0.75rem; line-height: 1.4; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -712,50 +712,87 @@ footer .fw { padding:0 28px; }
 .qst-obj-sep { color: var(--dim); font-weight: 700; font-size: 1.05rem; line-height: 1; flex-shrink: 0; user-select: none; }
 
 /* tarkov.dev-style item tiles */
-.tile-list { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 10px; }
+.tile-list { display: flex; flex-wrap: wrap; gap: 12px 14px; margin-top: 10px; }
 .tile-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .tile {
-  display: inline-flex; flex-direction: column; align-items: center; gap: 5px;
-  width: auto; max-width: 104px; text-align: center; flex-shrink: 0;
+  display: inline-flex; flex-direction: column; align-items: center; gap: 4px;
+  width: auto; max-width: 110px; text-align: center; flex-shrink: 0;
+  text-decoration: none;
 }
 .tile-box {
-  position: relative; width: 64px; height: 64px; flex-shrink: 0;
-  background-color: #ece9e1;
-  outline: 1px solid #7a7469;
+  position: relative; flex-shrink: 0;
+  background-color: #353535;
+  outline: 2px solid #495154;
   display: flex; align-items: center; justify-content: center;
-  transition: outline-color 0.12s;
+  transition: outline-color 0.15s ease, box-shadow 0.15s ease;
+  user-select: none;
+  overflow: hidden;
 }
-a.tile:hover .tile-box { outline-color: var(--gold-2); }
-.tile-box img { width: calc(100% - 4px); height: calc(100% - 4px); object-fit: contain; display: block; }
+a.tile:hover .tile-box, .item-card:hover .tile-box {
+  outline-color: #e0b64f;
+  box-shadow: 0 0 10px rgba(192, 160, 80, 0.35);
+}
+.tile-img {
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+  pointer-events: none;
+}
+.tile-tag {
+  position: absolute; right: 2.5px; top: 2px; z-index: 2;
+  color: #a4aeb4; font-weight: 700; font-size: 0.75rem;
+  font-family: 'Rajdhani', sans-serif;
+  line-height: 1;
+  text-shadow: 1px 1px 2px #000, -1px -1px 2px #000, 1px -1px 2px #000, -1px 1px 2px #000;
+  pointer-events: none;
+  white-space: nowrap;
+  max-width: calc(100% - 5px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl; text-align: left;
+}
+.pill.xp {
+  color: #7dd87d; border-color: rgba(90, 200, 90, 0.4);
+  background: rgba(90, 200, 90, 0.08);
+  font-weight: 600;
+}
 .tile-count {
-  position: absolute; left: 0; bottom: 0;
-  background: rgba(0,0,0,0.85);
-  border-top-right-radius: 3px;
-  color: var(--gold-2);
-  font-size: 0.62rem; font-weight: 700;
-  height: 15px; line-height: 16px;
+  position: absolute; right: 2px; bottom: 2px; z-index: 3;
+  background: rgba(12, 14, 18, 0.92);
+  border-top-left-radius: 3px;
+  color: #e0b64f;
+  font-size: 0.68rem; font-weight: 700;
+  font-family: 'Rajdhani', monospace, sans-serif;
+  height: 16px; line-height: 16px;
   padding: 0 4px; text-align: center;
   pointer-events: none;
 }
-.tile-fir {
-  position: absolute; right: 0; bottom: 0;
-  background: #1d7a2e;
-  border-top-left-radius: 3px;
-  color: #d8ffe0;
-  font-size: 0.7rem; font-weight: 900;
-  line-height: 1.25;
-  padding: 1px 4px 2px;
+.tile-fir-img {
+  position: absolute; right: 2px; bottom: 20px; z-index: 3;
+  width: 18px; height: 18px;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.8));
+}
+.tile-dogtag {
+  position: absolute; left: 0; top: 0; z-index: 3;
+  background: rgba(26, 75, 120, 0.9);
+  border-bottom-right-radius: 3px;
+  color: #d0e8ff;
+  font-size: 0.62rem; font-weight: 700;
+  height: 15px; line-height: 15px;
+  padding: 0 4px; text-align: center;
   pointer-events: none;
 }
 .tile-name {
-  font-size: 0.72rem; line-height: 1.15; color: #a4aeb4;
-  max-width: 84px;
+  font-size: 0.73rem; line-height: 1.15; color: #a4aeb4;
+  max-width: 96px;
   overflow: hidden;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   word-break: break-word;
+  transition: color 0.12s ease;
 }
 a.tile:hover .tile-name { color: var(--text); }
-.tile-plus { color: var(--dim); font-size: 0.9rem; flex-shrink: 0; }
+.tile-plus { color: var(--dim); font-size: 1rem; font-weight: 700; flex-shrink: 0; margin: 0 2px; }
 
 /* Needed items inside a quest objective */
 .qst-needs { margin-top: 12px; }
@@ -764,3 +801,19 @@ a.tile:hover .tile-name { color: var(--text); }
   text-transform: uppercase; color: var(--dim); margin-bottom: 4px;
 }
 .qst-needs .tile-list { margin-top: 6px; }
+
+/* Trader standing rewards (tarkov.dev style) */
+.qst-reward-standing { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.qst-standing {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #141312; border: 1px solid #2a2825;
+  padding: 6px 10px 6px 6px;
+}
+.qst-standing-img {
+  width: 40px; height: 40px; object-fit: contain;
+  background: #0d0d0c; border: 1px solid #2a2825; flex-shrink: 0;
+}
+.qst-standing-name { font-size: 0.78rem; color: #a4aeb4; font-weight: 600; }
+.qst-standing-val { font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.qst-standing.up .qst-standing-val { color: #6fcf7a; }
+.qst-standing.down .qst-standing-val { color: #e05757; }

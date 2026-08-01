@@ -16,26 +16,24 @@ function itemMetaRow(label, value) {
 }
 
 function itemIconHtmlBig(item) {
-  var w = item && item.width;
-  var h = item && item.height;
-  var box = "";
-  if (w && h && w > 0 && h > 0) {
-    var cell = 64;
-    var bw = w * cell;
-    var bh = h * cell;
-    var scale = Math.min(1, 192 / Math.max(bw, bh));
-    bw = Math.round(bw * scale);
-    bh = Math.round(bh * scale);
-    box = ' style="width:' + bw + 'px;height:' + bh + 'px;' + tileGridStyle(cell * scale) + '"';
-  }
-  var primary = (item && (item.gridImageLink || item.imageLink)) || "";
-  var fallback = (item && item.gridImageLink && item.imageLink)
-    ? item.imageLink
-    : (item && item.fallbackIconLink) || "";
+  var cellPx = 200 / Math.max(1, (item && item.width) || 1, (item && item.height) || 1);
+  cellPx = Math.max(24, Math.round(cellPx));
+  var box = ' style="width:200px;height:200px;' + tileGridStyle(item, cellPx) + '"';
+  var tdevBase = (item && item.gameId)
+    ? "https://assets.tarkov.dev/" + item.gameId + "-base-image.webp"
+    : "";
+  var primary = (item && (tdevBase || item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
+  var fallback = (item && tdevBase && (item.image512pxLink || item.gridImageLink))
+    ? (item.image512pxLink || item.gridImageLink)
+    : (item && (item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
+  var tag = (item && (item.shortName || item.name))
+    ? '<span class="tile-tag">' + App.esc(item.shortName || item.name) + '</span>'
+    : "";
   return '<span class="item-grid-big"' + box + '>' +
     '<img class="item-ic-big" src="' + App.esc(primary) + '" alt="" ' +
     'onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
     (fallback ? ' data-f="' + App.esc(fallback) + '"' : '') + ' />' +
+    tag +
     '</span>';
 }
 
@@ -170,17 +168,28 @@ function renderItem(id) {
   );
 
   var safeId = App.esc(id);
-  var query = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
+  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  function fetchItem(q) {
+    return fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: q })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (j.errors) throw new Error((j.errors[0] && j.errors[0].message) || "GraphQL error");
+        if (!j.data || !j.data.item) throw new Error("Not found");
+        return j.data.item;
+      });
+  }
+  fetchItem(queryWithColor).catch(function (e) {
+    console.warn("Item query with backgroundColor unavailable, retrying without:", e.message);
+    return fetchItem(queryNoColor);
   })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.item) throw new Error("Not found");
-      itemRenderDetail(j.data.item);
-      document.title = "TarkovLab | " + (j.data.item.name || j.data.item.id);
+    .then(function (item) {
+      itemRenderDetail(item);
+      document.title = "TarkovLab | " + (item.name || item.id);
     })
     .catch(function (e) {
       console.error("Failed to load item:", e.message);
