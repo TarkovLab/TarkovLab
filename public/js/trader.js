@@ -1,12 +1,5 @@
 function barterItemHtml(it) {
-  return '<span class="barter-item">' +
-    (it.imageLink
-      ? '<img class="barter-ic" src="' + App.esc(it.imageLink) + '" alt="" loading="lazy" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-        (it.fallbackIconLink ? ' data-f="' + App.esc(it.fallbackIconLink) + '"' : '') + ' />'
-      : '') +
-    '<a class="barter-name" href="/items/' + App.esc(it.id || "") + '">' + App.esc(it.shortName || it.name || it.id) + '</a>' +
-    (it.count > 1 ? '<span class="barter-count">x' + it.count + '</span>' : '') +
-    '</span>';
+  return tileItemHtml(it, it.count > 1 ? it.count : null);
 }
 
 function traderMetaRow(label, value) {
@@ -41,7 +34,7 @@ function traderRenderDetail(t) {
     bartersHtml = '<div class="sec"><div class="h">Barter offers <span class="cat-count">' + t.barters.length + '</span></div>';
     for (var i = 0; i < t.barters.length; i++) {
       var b = t.barters[i];
-      var reqs = (b.requiredItems || []).map(barterItemHtml).join(' <span class="barter-plus">+</span> ');
+      var reqs = tileRowHtml(b.requiredItems || []);
       bartersHtml += '<div class="barter">' +
         '<div class="barter-head">' +
           '<span class="pill">LL' + (b.minTraderLevel != null ? b.minTraderLevel : "?") + '</span> ' +

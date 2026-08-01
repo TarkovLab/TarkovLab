@@ -13,17 +13,7 @@ function hideoutDuration(ms) {
 }
 
 function hideoutItemReqHtml(r) {
-  return '<span class="barter-item">' +
-    (r.item && r.item.imageLink
-      ? '<img class="barter-ic" src="' + App.esc(r.item.imageLink) + '" alt="" loading="lazy" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-        (r.item.fallbackIconLink ? ' data-f="' + App.esc(r.item.fallbackIconLink) + '"' : '') + ' />'
-      : '') +
-    (r.item && r.item.id
-      ? '<a class="barter-name" href="/items/' + App.esc(r.item.id) + '">' + App.esc(r.item.shortName || r.item.name || r.item.id) + '</a>'
-      : '<span class="barter-name">Unknown</span>') +
-    '<span class="barter-count">x' + r.count + '</span>' +
-    (r.foundInRaid ? '<span class="pill">FIR</span>' : '') +
-    '</span>';
+  return tileItemHtml(r.item, r.count > 1 ? r.count : null, { fir: !!r.foundInRaid });
 }
 
 function hideoutStationReqHtml(r) {
@@ -61,7 +51,7 @@ function hideoutStationRenderDetail(s) {
       var lv = s.levels[i];
       var reqs = "";
       if (lv.itemRequirements && lv.itemRequirements.length > 0) {
-        reqs += '<div class="barter-side">' + lv.itemRequirements.map(hideoutItemReqHtml).join(' <span class="barter-plus">+</span> ') + '</div>';
+        reqs += '<div class="barter-side">' + tileRowHtml(lv.itemRequirements) + '</div>';
       }
       var other = "";
       if (lv.stationLevelRequirements && lv.stationLevelRequirements.length > 0) {
@@ -90,16 +80,7 @@ function hideoutStationRenderDetail(s) {
     craftsHtml = '<div class="sec"><div class="h">Crafts <span class="cat-count">' + s.crafts.length + '</span></div>';
     for (var i = 0; i < s.crafts.length; i++) {
       var c = s.crafts[i];
-      var reqs = (c.requiredItems || []).map(function (r) {
-        return '<span class="barter-item">' +
-          (r.imageLink
-            ? '<img class="barter-ic" src="' + App.esc(r.imageLink) + '" alt="" loading="lazy" onerror="this.onerror=null;if(this.getAttribute(\'data-f\')){this.src=this.getAttribute(\'data-f\')}else{this.style.display=\'none\'}"' +
-              (r.fallbackIconLink ? ' data-f="' + App.esc(r.fallbackIconLink) + '"' : '') + ' />'
-            : '') +
-          '<a class="barter-name" href="/items/' + App.esc(r.id || "") + '">' + App.esc(r.shortName || r.name || r.id) + '</a>' +
-          (r.count > 1 ? '<span class="barter-count">x' + r.count + '</span>' : '') +
-          '</span>';
-      }).join(' <span class="barter-plus">+</span> ');
+      var reqs = tileRowHtml(c.requiredItems || []);
       craftsHtml += '<div class="barter">' +
         '<div class="barter-head">' +
           '<span class="pill lvl">Level ' + (c.level != null ? c.level : "?") + '</span> ' +
@@ -108,7 +89,7 @@ function hideoutStationRenderDetail(s) {
         '<div class="barter-body">' +
           '<div class="barter-side">' + reqs + '</div>' +
           '<div class="barter-arrow">&#x2192;</div>' +
-          '<div class="barter-side">' + hideoutItemReqHtml({ item: c.productItem, count: c.productItem.count, foundInRaid: false }) + '</div>' +
+          '<div class="barter-side">' + tileItemHtml(c.productItem, c.productItem.count > 1 ? c.productItem.count : null) + '</div>' +
         '</div>' +
         '</div>';
     }

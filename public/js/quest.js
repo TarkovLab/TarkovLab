@@ -70,10 +70,10 @@ function questMetaRow(label, value) {
   return '<div class="qst-meta-row"><span class="qst-meta-label">' + label + '</span><span class="qst-meta-val">' + value + '</span></div>';
 }
 
-function questObjHtml(q, o, idx) {
+function questObjHtml(q, o, idx, needed) {
   var type = questTypeLabel(o.type);
   var badge = o.optional ? '<span class="pill opt">Optional</span>' : '<span class="pill req">Required</span>';
-  var num = '<span class="qst-obj-num" style="background:' + questObjColor(idx) + '">' + (idx + 1) + '</span>';
+  var sep = '<span class="qst-obj-sep">&ndash;</span>';
   var locations = "";
   if (o.locations && o.locations.length > 0) {
     locations = '<div class="qst-locs">';
@@ -88,10 +88,15 @@ function questObjHtml(q, o, idx) {
     }
     locations += '</div>';
   }
+  var needs = "";
+  if (needed && needed.length > 0) {
+    needs = '<div class="qst-needs"><div class="h-sub">Needed items</div>' + tileListHtml(needed) + '</div>';
+  }
   return '<div class="qst-obj">' +
-    '<div class="qst-obj-head">' + num + '<span class="qst-obj-type">' + App.esc(type) + '</span> ' + badge + '</div>' +
+    '<div class="qst-obj-head">' + sep + '<span class="qst-obj-type">' + App.esc(type) + '</span> ' + badge + '</div>' +
     '<div class="qst-obj-desc">' + App.esc(o.description || "No description.") + '</div>' +
     locations +
+    needs +
     '</div>';
 }
 
@@ -235,7 +240,7 @@ function questMiniMapsHtml(quest) {
   return { html: section, mapIds: mapIds };
 }
 
-function questRenderDetail(q) {
+function questRenderDetail(q, neededItems) {
   var de = App.$("q-detail");
   if (!de) return;
 
@@ -254,15 +259,34 @@ function questRenderDetail(q) {
     ? '<img class="qst-banner" src="' + App.esc(q.imageLink) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />'
     : "";
 
+  var needsByObj = {};
+  var leftoverNeeds = [];
+  if (neededItems) {
+    for (var i = 0; i < neededItems.length; i++) {
+      var n = neededItems[i];
+      if (n.objectiveId) {
+        (needsByObj[n.objectiveId] = needsByObj[n.objectiveId] || []).push(n);
+      } else {
+        leftoverNeeds.push(n);
+      }
+    }
+  }
+
   var objectives = "";
   if (q.objectives && q.objectives.length > 0) {
     objectives = '<div class="sec"><div class="h">Objectives <span class="cat-count">' + q.objectives.length + '</span></div>';
     for (var i = 0; i < q.objectives.length; i++) {
-      objectives += questObjHtml(q, q.objectives[i], i);
+      var o = q.objectives[i];
+      objectives += questObjHtml(q, o, i, needsByObj[o.id]);
     }
     objectives += '</div>';
   } else {
     objectives = '<div class="sec"><div class="h">Objectives</div><p class="qst-desc">No objectives listed for this quest.</p></div>';
+  }
+
+  if (leftoverNeeds.length > 0) {
+    objectives += '<div class="sec"><div class="h">Other required items <span class="cat-count">' + leftoverNeeds.length + '</span></div>' +
+      tileListHtml(leftoverNeeds) + '</div>';
   }
 
   var mini = questMiniMapsHtml(q);
@@ -326,6 +350,25 @@ function questRenderDetail(q) {
   }
 }
 
+function questFetchNeededItems(id) {
+  var safeId = App.esc(id);
+  var query = 'query { quest(id: "' + safeId + '") { neededItems { item { id name shortName imageLink fallbackIconLink } count objectiveId objectiveType objectiveDescription } } }';
+  return fetch(App.API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: query })
+  })
+    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    .then(function (j) {
+      if (!j.data || !j.data.quest || !j.data.quest.neededItems) return [];
+      return j.data.quest.neededItems;
+    })
+    .catch(function (e) {
+      console.warn("Needed items unavailable:", e.message);
+      return [];
+    });
+}
+
 function renderQuest(id) {
   if (!id) {
     App.render('<div class="state err"><span class="t">No quest selected</span><a class="back-link" href="/quests">&larr; Back to Quests</a></div>');
@@ -339,16 +382,22 @@ function renderQuest(id) {
 
   var safeId = App.esc(id);
   var query = 'query { quest(id: "' + safeId + '") { id gameId name normalizedName trader map minPlayerLevel kappa lightkeeper experience wiki antifandomLink imageLink objectives { id type description optional locations { map zoneId x y xPct yPct level world { x y z } outline } } } }';
-  fetch(App.API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query: query })
-  })
-    .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-    .then(function (j) {
-      if (!j.data || !j.data.quest) throw new Error("Not found");
-      questRenderDetail(j.data.quest);
-      document.title = "TarkovLab | " + j.data.quest.name;
+  Promise.all([
+    fetch(App.API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: query })
+    })
+      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function (j) {
+        if (!j.data || !j.data.quest) throw new Error("Not found");
+        return j.data.quest;
+      }),
+    questFetchNeededItems(id)
+  ])
+    .then(function (res) {
+      questRenderDetail(res[0], res[1]);
+      document.title = "TarkovLab | " + res[0].name;
     })
     .catch(function (e) {
       console.error("Failed to load quest:", e.message);
