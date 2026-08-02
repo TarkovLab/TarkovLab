@@ -102,6 +102,40 @@ function itemNeedRowsHtml(nf) {
   return qRows + bRows + cRows;
 }
 
+function itemVariantHumanize(id, baseId) {
+  var s = id;
+  if (baseId && s.indexOf(baseId + "-") === 0) s = s.slice(baseId.length + 1);
+  return s.replace(/[-_]+/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
+function itemVariantsHtml(item) {
+  var variants = item.variants || [];
+  if (!variants.length) return "";
+  var baseId = item.baseItemId || item.id;
+  var opts = [];
+  for (var i = 0; i < variants.length; i++) {
+    var v = variants[i];
+    var label;
+    if (v.isDefault) label = "Default";
+    else if (v.isBase) label = "No build";
+    else label = v.shortName || v.name || itemVariantHumanize(v.id, baseId);
+    opts.push({ id: v.id, label: label, isDefault: v.isDefault, isBase: v.isBase });
+  }
+  opts.sort(function (a, b) {
+    if (a.isDefault) return -1;
+    if (b.isDefault) return 1;
+    if (a.isBase) return 1;
+    if (b.isBase) return -1;
+    return 0;
+  });
+  var optsHtml = "";
+  for (var j = 0; j < opts.length; j++) {
+    var o = opts[j];
+    optsHtml += '<option value="' + App.esc(o.id) + '"' + (o.id === item.id ? ' selected' : '') + '>' + App.esc(o.label) + '</option>';
+  }
+  return '<select class="variant-select" aria-label="Variantes">' + optsHtml + '</select>';
+}
+
 function itemRenderDetail(item) {
   var de = App.$("i-detail");
   if (!de) return;
@@ -126,6 +160,7 @@ function itemRenderDetail(item) {
           '<div class="qst-dcat">' + App.esc(item.shortName || "Item") + '</div>' +
           '<h2 class="qst-dname">' + App.esc(item.name || item.id) + '</h2>' +
           '<div class="qst-dmeta">' + types + '</div>' +
+          '<div class="variant-select-row"><label class="variant-select-label" for="variant-select">Variantes</label>' + itemVariantsHtml(item) + '</div>' +
         '</div>' +
         itemIconHtmlBig(item) +
       '</div>' +
@@ -154,6 +189,14 @@ function itemRenderDetail(item) {
       });
     })(btns[b]);
   }
+
+  var vs = de.querySelector(".variant-select");
+  if (vs) {
+    vs.addEventListener("change", function () {
+      window.history.pushState(null, "", "/items/" + encodeURIComponent(vs.value));
+      window.dispatchEvent(new PopStateEvent("popstate"));
+    });
+  }
 }
 
 function renderItem(id) {
@@ -168,8 +211,8 @@ function renderItem(id) {
   );
 
   var safeId = App.esc(id);
-  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
-  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink defaultPresetId baseItemId variants { id name shortName isDefault isBase } sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink defaultPresetId baseItemId variants { id name shortName isDefault isBase } sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
   function fetchItem(q) {
     return fetch(App.API, {
       method: "POST",
@@ -188,6 +231,14 @@ function renderItem(id) {
     return fetchItem(queryNoColor);
   })
     .then(function (item) {
+      if (
+        item.types && item.types.indexOf("gun") !== -1 &&
+        item.defaultPresetId && item.defaultPresetId !== item.id
+      ) {
+        window.history.pushState(null, "", "/items/" + encodeURIComponent(item.defaultPresetId));
+        window.dispatchEvent(new PopStateEvent("popstate"));
+        return;
+      }
       itemRenderDetail(item);
       document.title = "TarkovLab | " + (item.name || item.id);
     })

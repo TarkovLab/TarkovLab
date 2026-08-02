@@ -630,6 +630,13 @@ footer .fw { padding:0 28px; }
 .qst-dcat { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; }
 .qst-dname { font-family: 'Oswald', sans-serif; font-size: 2rem; font-weight: 600; margin: 0 0 10px; color: var(--text); }
 .qst-dmeta { display: flex; flex-wrap: wrap; gap: 8px; }
+.variant-select-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+.variant-select-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.variant-select {
+  background: #0a0a0a; color: var(--text); border: 1px solid var(--line-2);
+  padding: 6px 10px; font-size: 0.85rem; max-width: 340px;
+}
+.variant-select:focus { outline: none; border-color: var(--blue); }
 .qst-meta { display: grid; grid-template-columns: 1fr; gap: 0; }
 .qst-meta-row { display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 1px solid var(--line); }
 .qst-meta-row:last-child { border-bottom: none; }
