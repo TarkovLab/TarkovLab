@@ -817,3 +817,27 @@ a.tile:hover .tile-name { color: var(--text); }
 .qst-standing-val { font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .qst-standing.up .qst-standing-val { color: #6fcf7a; }
 .qst-standing.down .qst-standing-val { color: #e05757; }
+
+/* Craft / barter / skill unlock rewards */
+.qst-reward-tiles .h-sub { margin-top: 12px; }
+.qst-reward-line {
+  display: inline-flex; align-items: flex-start; gap: 10px;
+  background: #141312; border: 1px solid #2a2825;
+  padding: 6px;
+  max-width: 340px;
+}
+.qst-reward-info {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  padding-top: 2px; min-width: 0;
+}
+.qst-reward-trader {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-width: 0;
+}
+.qst-reward-trader .qst-standing-img { width: 26px; height: 26px; }
+.qst-reward-info .pill { margin: 0; }
+.qst-reward-info .qst-standing-name {
+  font-size: 0.78rem; color: #a4aeb4; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.qst-reward-tiles .qst-reward-line .tile-box { max-width: 96px; }

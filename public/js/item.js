@@ -19,10 +19,10 @@ function itemIconHtmlBig(item) {
   var cellPx = 200 / Math.max(1, (item && item.width) || 1, (item && item.height) || 1);
   cellPx = Math.max(24, Math.round(cellPx));
   var box = ' style="width:200px;height:200px;' + tileGridStyle(item, cellPx) + '"';
-  var tdevBase = (item && item.gameId)
-    ? "https://assets.tarkov.dev/" + item.gameId + "-base-image.webp"
+  var tdevBase = (item && item.id)
+    ? "https://assets.tarkovlab.org/items/" + String(item.id).replace(/-/g, "_") + "-base-image.webp"
     : "";
-  var primary = (item && (tdevBase || item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
+  var primary = (item && (item.image512pxLink || tdevBase || item.gridImageLink || item.imageLink)) || "";
   var fallback = (item && tdevBase && (item.image512pxLink || item.gridImageLink))
     ? (item.image512pxLink || item.gridImageLink)
     : (item && (item.image512pxLink || item.gridImageLink || item.imageLink)) || "";
@@ -168,8 +168,8 @@ function renderItem(id) {
   );
 
   var safeId = App.esc(id);
-  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
-  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryWithColor = 'query { item(id: "' + safeId + '") { id gameId name shortName backgroundColor types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
+  var queryNoColor = 'query { item(id: "' + safeId + '") { id gameId name shortName types weight width height basePrice wikiLink antifandomLink imageLink fallbackIconLink gridImageLink image512pxLink sellToTrader { trader price } buyFromTrader { trader price minTraderLevel } neededFor { quests { quest questName objectiveId objectiveType objectiveDescription count } barters { barter trader traderName minTraderLevel count } crafts { craft station level duration count } } } }';
   function fetchItem(q) {
     return fetch(App.API, {
       method: "POST",

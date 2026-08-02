@@ -102,7 +102,7 @@ function renderTrader(id) {
   function loadTrader(opts) {
     opts = opts || {};
     var itemFields = opts.dims
-      ? ' id name shortName imageLink fallbackIconLink gridImageLink width height count'
+      ? ' id gameId name shortName backgroundColor imageLink fallbackIconLink gridImageLink image512pxLink width height count'
       : ' id name shortName imageLink fallbackIconLink count';
     var levelFields = opts.reputation
       ? 'level requiredPlayerLevel requiredReputation payRate insuranceRate'
