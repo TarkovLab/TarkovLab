@@ -4,23 +4,20 @@ function getItemImageCandidates(it) {
   if (!it) return ["/assets/icon.png"];
   var candidates = [];
 
-  // tarkov.dev-style order: base-image (item artwork sized to its slot,
+  // Local CDN order: base-image (item artwork sized to its slot,
   // transparent background) first, then the 512px variant for crisp
   // upscaling, the 64px icon, and only as last resorts the slot-baked
   // grid-image and any custom links.
-  if (it.gameId) {
-    candidates.push("https://assets.tarkov.dev/" + it.gameId + "-base-image.webp");
+  if (it.id) {
+    var base = "https://assets.tarkovlab.org/items/" + String(it.id).replace(/-/g, "_");
+    candidates.push(base + "-base-image.webp");
+    candidates.push(base + "-512.webp");
+    candidates.push(base + "-icon.webp");
   }
   if (it.image512pxLink) candidates.push(it.image512pxLink);
-  if (it.gameId) {
-    candidates.push("https://assets.tarkov.dev/" + it.gameId + "-512.webp");
-  }
-  if (it.gameId) {
-    candidates.push("https://assets.tarkov.dev/" + it.gameId + "-icon.webp");
-  }
-  if (it.fallbackIconLink) candidates.push(it.fallbackIconLink);
   if (it.imageLink) candidates.push(it.imageLink);
   if (it.gridImageLink) candidates.push(it.gridImageLink);
+  if (it.fallbackIconLink) candidates.push(it.fallbackIconLink);
   candidates.push("/assets/icon.png");
 
   var unique = [];

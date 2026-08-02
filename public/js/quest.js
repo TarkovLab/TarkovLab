@@ -58,6 +58,11 @@ function questTraderName(t) {
   return String(t).replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
 }
 
+function questStationLabel(s) {
+  if (!s) return "";
+  return String(s).replace(/_/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
 function questCopyRow(label, value) {
   if (!value) return '<div class="qst-meta-row"><span class="qst-meta-label">' + label + '</span><span class="qst-meta-val">—</span></div>';
   return '<div class="qst-meta-row"><span class="qst-meta-label">' + label + '</span><span class="qst-meta-val">' +
@@ -100,16 +105,82 @@ function questObjHtml(q, o, idx, needed) {
     '</div>';
 }
 
+function questSkillLabel(skill) {
+  return String(skill || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+}
+
+function questCraftUnlocksHtml(list) {
+  if (!list || list.length === 0) return "";
+  var html = '<div class="h-sub">Unlocked crafts</div><div class="qst-reward-tiles">';
+  for (var i = 0; i < list.length; i++) {
+    var c = list[i];
+    var st = c.station ? '<span class="pill lvl">' + App.esc(questStationLabel(c.station)) + '</span> ' : "";
+    html += '<span class="qst-reward-line">' +
+      tileItemHtml(c.item, c.count, { showCount: true, maxDim: 64 }) +
+      '<span class="qst-reward-info">' + st + '<span class="pill xp">Lv ' + (c.level != null ? c.level : 1) + '</span></span>' +
+      '</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function questTraderUnlocksHtml(list) {
+  if (!list || list.length === 0) return "";
+  var html = '<div class="h-sub">New barter offers</div><div class="qst-reward-tiles">';
+  for (var i = 0; i < list.length; i++) {
+    var u = list[i];
+    var trader = '<span class="qst-reward-trader">' +
+      (u.traderImageLink ? '<img class="qst-standing-img" src="' + App.esc(u.traderImageLink) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' : "") +
+      '<span class="qst-standing-name">' + App.esc(u.traderName || questTraderName(u.trader)) + '</span></span>';
+    html += '<span class="qst-reward-line">' +
+      tileItemHtml(u.item, u.count, { showCount: true, maxDim: 64 }) +
+      '<span class="qst-reward-info">' + trader + '<span class="pill">LL' + (u.level != null ? u.level : 1) + '</span></span>' +
+      '</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
+function questSkillRewardsHtml(list) {
+  if (!list || list.length === 0) return "";
+  var html = '<div class="h-sub">Skill levels</div><div class="qst-reward-standing">';
+  for (var i = 0; i < list.length; i++) {
+    var s = list[i];
+    var skill = String(s.skill || "").replace(/[^a-zA-Z0-9]/g, "");
+    html += '<span class="qst-standing">' +
+      '<img class="qst-standing-img" src="https://assets.tarkovlab.org/skills/skill-' + App.esc(skill) + '-icon.webp" alt="" loading="lazy" onerror="this.style.display=\'none\'" />' +
+      '<span class="qst-standing-name">' + App.esc(questSkillLabel(s.skill)) + '</span>' +
+      '<span class="qst-standing-val">Lv ' + (s.level != null ? s.level : 1) + '</span>' +
+      '</span>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function questRewardSetHtml(label, set, experience) {
   if (!set) return "";
   var hasItems = set.items && set.items.length > 0;
   var hasStanding = set.traderStanding && set.traderStanding.length > 0;
-  if (!hasItems && !hasStanding) return "";
+  var hasCrafts = set.craftUnlocks && set.craftUnlocks.length > 0;
+  var hasOffers = set.traderUnlocks && set.traderUnlocks.length > 0;
+  var hasSkills = set.skillLevelRewards && set.skillLevelRewards.length > 0;
+  if (!hasItems && !hasStanding && !hasCrafts && !hasOffers && !hasSkills) return "";
   var html = '<div class="sec"><div class="h">' + App.esc(label) + ' rewards' +
     (experience ? ' <span class="pill xp">+' + Number(experience).toLocaleString() + ' XP</span>' : '') +
     '</div>';
   if (hasItems) {
     html += '<div class="qst-reward-tiles">' + tileListHtml(set.items) + '</div>';
+  }
+  if (hasCrafts) {
+    html += questCraftUnlocksHtml(set.craftUnlocks);
+  }
+  if (hasOffers) {
+    html += questTraderUnlocksHtml(set.traderUnlocks);
+  }
+  if (hasSkills) {
+    html += questSkillRewardsHtml(set.skillLevelRewards);
   }
   if (hasStanding) {
     html += questStandingHtml(set.traderStanding);
@@ -432,7 +503,10 @@ function questFetchRewards(id) {
     var itemFields = dims
       ? 'id gameId name shortName backgroundColor imageLink fallbackIconLink gridImageLink image512pxLink width height'
       : 'id name shortName imageLink fallbackIconLink width height';
-    var query = 'query { quest(id: "' + safeId + '") { startRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } finishRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } } } }';
+    var extraFields = dims
+      ? 'craftUnlocks { station level item { ' + itemFields + ' } count } traderUnlocks { id level item { ' + itemFields + ' } count trader traderName traderImageLink } skillLevelRewards { skill level }'
+      : '';
+    var query = 'query { quest(id: "' + safeId + '") { startRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } ' + extraFields + ' } finishRewards { items { item { ' + itemFields + ' } count } traderStanding { trader standing } ' + extraFields + ' } } }';
     return fetch(App.API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

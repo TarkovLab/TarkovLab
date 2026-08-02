@@ -19,8 +19,8 @@ function itemIconHtmlBig(item) {
   var cellPx = 200 / Math.max(1, (item && item.width) || 1, (item && item.height) || 1);
   cellPx = Math.max(24, Math.round(cellPx));
   var box = ' style="width:200px;height:200px;' + tileGridStyle(item, cellPx) + '"';
-  var tdevBase = (item && item.gameId)
-    ? "https://assets.tarkov.dev/" + item.gameId + "-base-image.webp"
+  var tdevBase = (item && item.id)
+    ? "https://assets.tarkovlab.org/items/" + String(item.id).replace(/-/g, "_") + "-base-image.webp"
     : "";
   var primary = (item && (item.image512pxLink || tdevBase || item.gridImageLink || item.imageLink)) || "";
   var fallback = (item && tdevBase && (item.image512pxLink || item.gridImageLink))
