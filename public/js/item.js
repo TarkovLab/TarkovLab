@@ -108,32 +108,68 @@ function itemVariantHumanize(id, baseId) {
   return s.replace(/[-_]+/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); });
 }
 
-function itemVariantsHtml(item) {
-  var variants = item.variants || [];
-  if (!variants.length) return "";
-  var baseId = item.baseItemId || item.id;
-  var opts = [];
+function itemVariantSlugify(label) {
+  return String(label || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function itemVariantSlug(v, gunId) {
+  var s = itemVariantSlugify(v.shortName || v.name);
+  if (s) return s;
+  if (v.id.indexOf(gunId + "-") === 0) return v.id.slice(gunId.length + 1);
+  return v.id;
+}
+
+function itemVariantLabel(v, gunId) {
+  if (v.isDefault) return "Default";
+  if (v.isBase) return "No build";
+  return v.shortName || v.name || itemVariantHumanize(v.id, gunId);
+}
+
+function itemVariantIcon(id) {
+  return "https://assets.tarkovlab.org/items/" + String(id).replace(/-/g, "_") + "-base-image.webp";
+}
+
+function itemVariantsSection(gun, main) {
+  var variants = gun.variants || [];
+  var entries = [];
   for (var i = 0; i < variants.length; i++) {
     var v = variants[i];
-    var label;
-    if (v.isDefault) label = "Default";
-    else if (v.isBase) label = "No build";
-    else label = v.shortName || v.name || itemVariantHumanize(v.id, baseId);
-    opts.push({ id: v.id, label: label, isDefault: v.isDefault, isBase: v.isBase });
+    entries.push({
+      id: v.id,
+      label: itemVariantLabel(v, gun.id),
+      slug: itemVariantSlug(v, gun.id),
+      active: main.id === v.id,
+      tag: v.isDefault ? "Default" : (v.isBase ? "No build" : ""),
+      img: itemVariantIcon(v.id),
+    });
   }
-  opts.sort(function (a, b) {
-    if (a.isDefault) return -1;
-    if (b.isDefault) return 1;
-    if (a.isBase) return 1;
-    if (b.isBase) return -1;
-    return 0;
-  });
-  var optsHtml = "";
-  for (var j = 0; j < opts.length; j++) {
-    var o = opts[j];
-    optsHtml += '<option value="' + App.esc(o.id) + '"' + (o.id === item.id ? ' selected' : '') + '>' + App.esc(o.label) + '</option>';
+  if (!entries.some(function (e) { return e.id === gun.id; })) {
+    entries.unshift({
+      id: gun.id,
+      label: "No build",
+      slug: itemVariantSlug(gun, gun.id),
+      active: main.id === gun.id,
+      tag: "No build",
+      img: itemVariantIcon(gun.id),
+    });
   }
-  return '<select class="variant-select" aria-label="Variantes">' + optsHtml + '</select>';
+  var html = '<div class="sec"><div class="h">Variantes <span class="cat-count">' + entries.length + '</span></div><div class="var-list">';
+  for (var j = 0; j < entries.length; j++) {
+    var e = entries[j];
+    var href = e.tag === "Default"
+      ? "/items/" + encodeURIComponent(gun.id)
+      : "/items/" + encodeURIComponent(gun.id) + "?variants=" + encodeURIComponent(e.slug);
+    html += '<a class="var-item' + (e.active ? " active" : "") + '" href="' + href + '">' +
+      '<img src="' + itemVariantIcon(e.id) + '" alt="" loading="lazy" ' +
+      'onerror="this.onerror=null;this.style.display=\'none\'" />' +
+      '<span class="var-body"><span class="var-name">' + App.esc(e.label) + '</span>' +
+      (e.tag ? '<span class="var-tag">' + e.tag + '</span>' : '') +
+      '</span></a>';
+  }
+  return html + '</div></div>';
 }
 
 function itemRenderDetail(item) {
@@ -160,7 +196,6 @@ function itemRenderDetail(item) {
           '<div class="qst-dcat">' + App.esc(item.shortName || "Item") + '</div>' +
           '<h2 class="qst-dname">' + App.esc(item.name || item.id) + '</h2>' +
           '<div class="qst-dmeta">' + types + '</div>' +
-          '<div class="variant-select-row"><label class="variant-select-label" for="variant-select">Variantes</label>' + itemVariantsHtml(item) + '</div>' +
         '</div>' +
         itemIconHtmlBig(item) +
       '</div>' +
@@ -189,17 +224,9 @@ function itemRenderDetail(item) {
       });
     })(btns[b]);
   }
-
-  var vs = de.querySelector(".variant-select");
-  if (vs) {
-    vs.addEventListener("change", function () {
-      window.history.pushState(null, "", "/items/" + encodeURIComponent(vs.value));
-      window.dispatchEvent(new PopStateEvent("popstate"));
-    });
-  }
 }
 
-function renderItem(id) {
+function renderItem(id, variantSlug) {
   if (!id) {
     App.render('<div class="state err"><span class="t">No item selected</span><a class="back-link" href="/items">&larr; Back to Items</a></div>');
     return;
@@ -226,21 +253,53 @@ function renderItem(id) {
         return j.data.item;
       });
   }
+  function fetchItemById(itemId) {
+    return fetchItem(queryWithColor.replace('"' + safeId + '"', '"' + App.esc(itemId) + '"'))
+      .catch(function (e) {
+        console.warn("Item query with backgroundColor unavailable, retrying without:", e.message);
+        return fetchItem(queryNoColor.replace('"' + safeId + '"', '"' + App.esc(itemId) + '"'));
+      });
+  }
+  function resolveVariant(gun, slug) {
+    if (!slug) return null;
+    if (itemVariantSlugify(gun.shortName) === slug) return { id: gun.id, data: gun };
+    var variants = gun.variants || [];
+    for (var i = 0; i < variants.length; i++) {
+      if (itemVariantSlug(variants[i], gun.id) === slug) return { id: variants[i].id, data: null };
+    }
+    return null;
+  }
+  function showDetail(item, sectionHtml) {
+    itemRenderDetail(item);
+    document.title = "TarkovLab | " + (item.name || item.id);
+    if (sectionHtml) {
+      var de = App.$("i-detail");
+      if (de) de.insertAdjacentHTML("beforeend", sectionHtml);
+    }
+  }
   fetchItem(queryWithColor).catch(function (e) {
     console.warn("Item query with backgroundColor unavailable, retrying without:", e.message);
     return fetchItem(queryNoColor);
   })
     .then(function (item) {
-      if (
-        item.types && item.types.indexOf("gun") !== -1 &&
-        item.defaultPresetId && item.defaultPresetId !== item.id
-      ) {
-        window.history.pushState(null, "", "/items/" + encodeURIComponent(item.defaultPresetId));
-        window.dispatchEvent(new PopStateEvent("popstate"));
+      var isGun = item.types && item.types.indexOf("gun") !== -1 &&
+        !item.baseItemId && (item.defaultPresetId || (item.variants || []).length > 0);
+      if (!isGun) {
+        showDetail(item, null);
         return;
       }
-      itemRenderDetail(item);
-      document.title = "TarkovLab | " + (item.name || item.id);
+      var target = resolveVariant(item, variantSlug);
+      if (target && target.data) {
+        showDetail(target.data, itemVariantsSection(item, target.data));
+        return;
+      }
+      var targetId = (target && target.id) || item.defaultPresetId;
+      fetchItemById(targetId).then(function (main) {
+        showDetail(main, itemVariantsSection(item, main));
+      }).catch(function (e) {
+        console.error("Failed to load variant:", e.message);
+        showDetail(item, itemVariantsSection(item, item));
+      });
     })
     .catch(function (e) {
       console.error("Failed to load item:", e.message);

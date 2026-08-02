@@ -98,7 +98,7 @@ var App = (function () {
     } else if (path === "/items") {
       renderItems();
     } else if (path.indexOf("/items/") === 0) {
-      renderItem(decodeURIComponent(path.replace(/^\/items\//, "")));
+      renderItem(decodeURIComponent(path.replace(/^\/items\//, "")), new URLSearchParams(search).get("variants") || "");
     } else if (path === "/traders") {
       renderTraders();
     } else if (path.indexOf("/traders/") === 0) {
